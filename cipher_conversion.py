@@ -17,25 +17,10 @@ def get_cipher():
         
     if cipher == '1':
         key = input("Choose a key for the Caesar cipher: ")
-        while not key.isnumeric():
-            print('Invalid. Try again')
-            key = input("Choose a key for the Caesar cipher: ")
-        key = int(key)
-        cipher = Caesar(key)
-        
+        cipher = Caesar(key) 
     elif cipher == '2':
         a = input('Choose Key A for the Affine cipher: ')
-        while not a.isnumeric():
-            print('Invalid. Try again')
-            a = input('Choose Key A for the Affine cipher: ')
-        a = int(a)
-        
         b = input('Choose Key B for the Affine cipher: ')
-        while not b.isnumeric():
-            print('Invalid. Try again')
-            b = input('Choose Key B for the Affine cipher: ')
-        b = int(b)
-        
         cipher = Affine(a, b)
     return cipher
             

@@ -9,6 +9,24 @@ NUM_LETTERS = 26
 # Caesar Cipher
 class Caesar():
     def __init__(self, key):
+        valid = False
+        while not valid:
+            if isinstance(key, int):
+                if CONDITION:
+                    valid = True
+                else:
+                    print("Key needs to be a whole number greater than zero.")
+                    key = input("Choose another value for the key: ")
+            elif isinstance(key, str):
+                if key.isnumeric():
+                    key = int(key)
+                else:
+                    print("Key needs to be a whole number greater than zero.")
+                    key = input("Choose another value for the key: ")
+            elif isinstance(key, float):
+                print("Key needs to be a whole number greater than zero.")
+                key = input("Choose another value for the key: ")
+            
         self.key = key
 
     def __str__(self):
@@ -62,12 +80,45 @@ class Caesar():
 # Affine Cipher
 class Affine():
     def __init__(self, a, b):
-        while a not in VALUE_INVERSES:
-            print(f'Key A = {a} does not have an inverse in mod 26.')
-            a = int(input('Choose another value for a: '))
-        while b > NUM_LETTERS-1 or b < 0:
-            print(f'Key B = {b} is not between 0 and 25.')
-            b = int(input('Choose another value for b: '))
+        valid = False
+        while not valid:
+            if isinstance(a, int):
+                if a in VALUE_INVERSES:
+                    valid = True
+                else:
+                    print('Key A needs to be a whole number greater than zero '\
+                          'with an inverse in mod 26.')
+                    a = input('Choose another value for Key A: ')
+            elif isinstance(a, str):
+                if a.isnumeric():
+                    a = int(a)
+                else:
+                    print('Key A needs to be a whole number greater than zero '\
+                          'with an inverse in mod 26.')
+                    a = input('Choose another value for Key A: ')
+            elif isinstance(a, float):
+                print('Key A needs to be a whole number greater than zero '\
+                          'with an inverse in mod 26.')
+                a = input('Choose another value for Key A: ')
+
+        valid = False
+        while not valid:
+            if isinstance(b, int):
+                if 0 <= b <= NUM_LETTERS-1:
+                    valid = True
+                else:
+                    print('Key B needs to be a whole number between 0 and 25.')
+                    b = input('Choose another value for Key B: ')
+            elif isinstance(b, str):
+                if b.isnumeric():
+                    b = int(b)
+                else:
+                    print('Key B needs to be a whole number between 0 and 25.')
+                    b = input('Choose another value for Key B: ')
+            elif isinstance(b, float):
+                print('Key B needs to be a whole number between 0 and 25.')
+                b = input('Choose another value for Key B: ')
+
         self.a = a
         self.b = b
 
@@ -84,7 +135,8 @@ class Affine():
         encrypted_message = ''
         for letter in message:
             if letter.isalpha():
-                encrypted_letter_value = ((self.a * LETTER_VALUES[letter]) + self.b) % NUM_LETTERS
+                encrypted_letter_value = ((self.a * LETTER_VALUES[letter]) +
+                                          self.b) % NUM_LETTERS
                 encrypted_letter_values.append(encrypted_letter_value)
             else:
                 encrypted_letter_values.append(letter)                
@@ -124,18 +176,44 @@ class Affine():
 # RSA Cryptosystem
 class RSA():
     def __init__(self, p, q):
-        while not is_prime(p):
-            print(f'p = {p} is not a prime number.')
-            p = int(input('Choose another value for p: '))
+        valid = False
+        while not valid:
+            if isinstance(p, int):
+                if is_prime(p):
+                    valid = True
+                else:
+                    print('p needs to be a prime number.')
+                    p = input('Choose another value for p: ')
+            elif isinstance(p, str):
+                if p.isnumeric():
+                    p = int(p)
+                else:
+                    print('p needs to be a prime number.')
+                    p = input('Choose another value for p: ')
+            elif isinstance(p, float):
+                print('p needs to be a prime number.')
+                p = input('Choose another value for p: ')
         self.p = p
-        while not is_prime(q) or p == q:
-            if not is_prime(q):
-                print(f'q = {q} is not a prime number.')
-                q = int(input('Choose another value for q: '))
-            elif p == q:
-                print(f'p and q cannot be the same number.')
-                q = int(input('Choose another value for q: '))
+        
+        valid = False
+        while not valid:
+            if isinstance(q, int):
+                if is_prime(q) and q != self.p:
+                    valid = True
+                else:
+                    print("q needs to be a prime number that's different from p.")
+                    q = input('Choose another value for p: ')
+            elif isinstance(q, str):
+                if q.isnumeric():
+                    q = int(q)
+                else:
+                    print("q needs to be a prime number that's different from p.")
+                    q = input('Choose another value for p: ')
+            elif isinstance(q, float):
+                print("q needs to be a prime number that's different from p.")
+                q = input('Choose another value for p: ')
         self.q = q
+        
         self.n = p * q
         self.phi_n = (p-1) * (q-1)
         e = int(input(f'Choose an invertible element in mod {self.phi_n}: '))
