@@ -36,7 +36,6 @@ class Caesar():
             else:
                 encrypted_message += number
 
-        #print(f"{message} -> {encrypted_message}")
         return encrypted_message
 
     def decrypt(self, message):
@@ -58,17 +57,16 @@ class Caesar():
             else:
                 decrypted_message += number
 
-        #print(f"{message} -> {decrypted_message}")
         return decrypted_message
 
 # Affine Cipher
 class Affine():
     def __init__(self, a, b):
         while a not in VALUE_INVERSES:
-            print(f'a = {a} does not have an inverse in mod 26.')
+            print(f'Key A = {a} does not have an inverse in mod 26.')
             a = int(input('Choose another value for a: '))
         while b > NUM_LETTERS-1 or b < 0:
-            print(f'b = {b} is not between 0 and 25.')
+            print(f'Key B = {b} is not between 0 and 25.')
             b = int(input('Choose another value for b: '))
         self.a = a
         self.b = b
@@ -98,8 +96,7 @@ class Affine():
                         encrypted_message += key
             else:
                 encrypted_message += number
-                    
-        #print(f"{message} -> {encrypted_message}")
+
         return encrypted_message
 
     def decrypt(self, message):
@@ -122,7 +119,6 @@ class Affine():
             else:
                 decrypted_message += number
 
-        #print(f"{message} -> {decrypted_message}")
         return decrypted_message
 
 # RSA Cryptosystem

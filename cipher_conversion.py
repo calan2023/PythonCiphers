@@ -56,3 +56,24 @@ def cipher_to_plain():
         plain = code.decrypt(line)
         outfile.write(plain + '\n')
     outfile.close()
+
+def main():
+    print('''Available Conversions:
+1: Plaintext -> Ciphertext
+2: Ciphertext -> Plaintext''')
+    conversion = input("Choose a cipher conversion: ")
+    while conversion not in ['1', '2']:
+        print('Invalid. Try again')
+        conversion = input("Choose a cipher conversion: ")
+    print()
+    if conversion == '1':
+        input("Input your plaintext into the plain.txt file and press ENTER to continue.")
+        plain_to_cipher()
+        print("\nOpen the cipher.txt file to see the ciphertext")
+    elif conversion == '2':
+        input("Input your ciphertext into the cipher.txt file and press ENTER to continue.")
+        cipher_to_plain()
+        print("\nOpen the plain.txt file to see the plaintext")
+
+if __name__ == '__main__':
+    main()
