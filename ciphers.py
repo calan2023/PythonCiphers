@@ -1,3 +1,39 @@
+'''The module containing the classes for three types of ciphers used for
+encryption and decryption of text.
+
+All classes have five methods:
+    __init__():
+        Initialises the class by validating user input before assigning
+        attributes needed for the cipher.
+
+    __str__() and __repr__():
+        String representations of the class.
+
+        Returns:
+            String of all attributes assigned in the class
+
+    encrypt(message):
+        Encrypts text letter by letter  through using the equation for the
+        cipher and attributes of the class.
+
+        Args:
+            message (str): The plaintext that will be encrypted
+
+        Returns:
+            encrypted_message (str): The ciphertext version of message argument
+
+    decrypt(message):
+        Decrypts text letter by letter  through using the equation for the
+        cipher and attributes of the class.
+
+        Args:
+            message (str): The ciphertext that will be decrypted
+
+        Returns:
+            decrypted_message (str): The plaintext version of message argument
+
+'''
+
 LETTER_VALUES = {'a': 0, 'b': 1, 'c': 2, 'd': 3, 'e': 4, 'f': 5, 'g': 6, 'h': 7,
                  'i': 8, 'j': 9, 'k': 10, 'l': 11, 'm': 12, 'n': 13, 'o': 14,
                  'p': 15, 'q': 16, 'r': 17, 's': 18, 't': 19, 'u': 20, 'v': 21,
@@ -6,9 +42,14 @@ VALUE_INVERSES = {1: 1, 3: 9, 5: 21, 7: 15, 9: 3, 11: 19, 15: 7, 17: 23, 19: 11,
                   21: 5, 23: 17, 25: 25}
 NUM_LETTERS = 26
 
-# Caesar Cipher
+# Caesar Cipher ================================================================
+
 class Caesar():
     def __init__(self, key):
+        '''Args:
+            key (int): The key used for shifting letters in a Caesar cipher
+        '''
+        
         valid = False
         while not valid:
             if isinstance(key, int):
@@ -77,9 +118,17 @@ class Caesar():
 
         return decrypted_message
 
-# Affine Cipher
+# Affine Cipher ================================================================
+
 class Affine():
     def __init__(self, a, b):
+        '''Args:
+            a (int): The value that's multiplied to value of letter in an Affine
+            cipher
+            b (int): The value that's added to the product of a and value of
+            letter in an Affine cipher
+        '''
+        
         valid = False
         while not valid:
             if isinstance(a, int):
@@ -173,9 +222,16 @@ class Affine():
 
         return decrypted_message
 
-# RSA Cryptosystem
+# RSA Cryptosystem =============================================================
+
 class RSA():
     def __init__(self, p, q):
+        '''Args:
+            p (int): A prime number used in an RSA Cryptosystem
+            q (int): A second prime number different from p used in an RSA
+            Cryptosystem
+        '''
+        
         valid = False
         while not valid:
             if isinstance(p, int):
@@ -233,17 +289,29 @@ class RSA():
     def __repr__(self):
         return f'p = {self.p}\nq = {self.q}\nn = {self.n}\nΦ(n) = {self.phi_n}\ne = {self.e}\nd = {self.d}\nPublic key = {self.public_key}'
     
-    def encrypt(self, m):
+    def encrypt(self, message):
         '''c = m^e (mod n)'''
-        c = (m ** self.e) % self.n
-        return c
+        encrypted_message = (message ** self.e) % self.n
+        return encrypted_message
 
-    def decrypt(self, c):
+    def decrypt(self, message):
         '''m = c^d (mod n)'''
-        m = (c ** self.d) % self.n
-        return m
+        decrypted_message = (message ** self.d) % self.n
+        return decrypted_message
         
 def is_prime(num):
+    '''Checks if number is prime. If number is less than or equal to 1, or if
+    there exists a number 'i' between 2 and the number given where the number
+    mod 'i' equals 0, then number is not prime. Otherwise, the number will be
+    prime.
+
+    Args:
+        num (int): The number being checked to see if it's prime
+
+    Returns:
+        prime (bool): The result of whether number is prime
+    '''
+    
     prime = True
     if num <= 1:
         prime = False
@@ -255,6 +323,19 @@ def is_prime(num):
     return prime
 
 def is_invertible(num, phi_n):
+    '''Checks if number has a multiplicative inverse in mod Φ(n). If there exists
+    a number 'i' between 1 and Φ(n) where the number x 'i' mod Φ(n) equals 1,
+    then number is invertible. Otherwise, the number will not be invertible.
+
+    Args:
+        num (int): The number being checked to see if it's invertible
+        phi_n (int): Represents value for Φ(n)
+
+    Returns:
+        invertible (bool): The result of whether number is invertible
+        d (int): The multiplicative inverse of the number in mod Φ(n)
+    '''
+    
     invertible = False
     d = None
     for i in range(1, phi_n):

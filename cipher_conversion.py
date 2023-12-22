@@ -1,12 +1,30 @@
 from ciphers import *
 
 def get_lines(file):
+    '''Reads lines in a file and returns them in a list.
+
+    Args:
+        file (str): The file location of text
+
+    Returns:
+        lines (list): List containing each line of text in the file
+    '''
+    
     infile = open(file)
     lines = infile.read().splitlines()
     infile.close()
     return lines
 
 def get_cipher():
+    '''Prints available ciphers. Gets and validates users choice. If user chooses
+    Caesar cipher, user is asked to enter a key and Caesar class is created. If
+    user chooses Affine cipher user is asked to enter Key A and Key B and Affine
+    class is created.
+
+    Returns:
+        cipher (class): The cipher chosen by the user
+    '''
+    
     print('''Available Ciphers:
 1: Caesar
 2: Affine''')
@@ -25,6 +43,11 @@ def get_cipher():
     return cipher
             
 def plain_to_cipher():
+    '''Gets lines in plain.txt file and gets cipher user wants to use. Opens
+    cipher.txt file and encrypts each line and writes the encrypted line into
+    cipher.txt file.
+    '''
+    
     lines = get_lines('plain.txt')
     code = get_cipher()
     outfile = open('cipher.txt', 'a')
@@ -34,6 +57,11 @@ def plain_to_cipher():
     outfile.close()
 
 def cipher_to_plain():
+    '''Gets lines in cipher.txt file and gets cipher user wants to use. Opens
+    plain.txt file and decrypts each line and writes the decrypted line into
+    plain.txt file.
+    '''
+    
     lines = get_lines('cipher.txt')
     code = get_cipher()
     outfile = open('plain.txt', 'a')
@@ -43,6 +71,15 @@ def cipher_to_plain():
     outfile.close()
 
 def main():
+    '''Prints available conversions. Gets and validates users choice. If user
+    chooses 'Plaintext -> Ciphertext', it instructs the user to enter plaintext
+    into plain.txt file, and after pressing ENTER, runs plain_to_cipher() and
+    tells user to open cipher.txt to see ciphertext. If user chooses
+    'Ciphertext -> Plaintext', it instructs the user to enter ciphertext
+    into cipher.txt file, and after pressing ENTER, runs cipher_to_plain() and
+    tells user to open plain.txt to see plaintext.
+    '''
+    
     print('''Available Conversions:
 1: Plaintext -> Ciphertext
 2: Ciphertext -> Plaintext''')
