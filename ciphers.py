@@ -13,8 +13,8 @@ All classes have five methods:
             String of all attributes assigned in the class
 
     encrypt(message):
-        Encrypts text letter by letter  through using the equation for the
-        cipher and attributes of the class.
+        Validates user message. Encrypts text letter by letter through using
+        the equation for the cipher and attributes of the class.
 
         Args:
             message (str): The plaintext that will be encrypted
@@ -23,8 +23,8 @@ All classes have five methods:
             encrypted_message (str): The ciphertext version of message argument
 
     decrypt(message):
-        Decrypts text letter by letter  through using the equation for the
-        cipher and attributes of the class.
+        Validates user message. Decrypts text letter by letter through using
+        the equation for the cipher and attributes of the class.
 
         Args:
             message (str): The ciphertext that will be decrypted
@@ -45,15 +45,20 @@ NUM_LETTERS = 26
 # Caesar Cipher ================================================================
 
 class Caesar():
+    '''Attributes:
+        key (int): The key used for shifting letters in a Caesar cipher 
+    '''
+    
     def __init__(self, key):
         '''Args:
-            key (int): The key used for shifting letters in a Caesar cipher
+            key (int): The key chosen by the user for shifting letters in a
+            Caesar cipher
         '''
         
         valid = False
         while not valid:
             if isinstance(key, int):
-                if CONDITION:
+                if key > 0:
                     valid = True
                 else:
                     print("Key needs to be a whole number greater than zero.")
@@ -121,12 +126,19 @@ class Caesar():
 # Affine Cipher ================================================================
 
 class Affine():
+    '''Attributes:
+        a (int): The value that's multiplied to value of letter in an Affine
+        cipher
+        b (int): The value that's added to the product of a and value of letter
+        in an Affine cipher
+    '''
+    
     def __init__(self, a, b):
         '''Args:
-            a (int): The value that's multiplied to value of letter in an Affine
-            cipher
-            b (int): The value that's added to the product of a and value of
+            a (int): The value chosen by the user that's multiplied to value of
             letter in an Affine cipher
+            b (int): The value chosen by the user that's added to the product of
+            a and value of letter in an Affine cipher
         '''
         
         valid = False
@@ -225,11 +237,27 @@ class Affine():
 # RSA Cryptosystem =============================================================
 
 class RSA():
+    '''Attributes:
+        p (int): The first prime number used in an RSA Cryptosystem
+        q (int): The second prime number, different from p, used in an RSA
+        Cryptosystem
+        n (int): The product of p and q used in an RSA Cryptosystem
+        phi_n (int): The number of positive integers less than n that are
+        co-prime to n, used in an RSA Cryptosystem
+        e (int): The number which has a multiplicative inverse in modulo phi_n
+        used in an RSA Cryptosystem
+        d (int): The multiplicative inverse of e in modulo phi_n used in an RSA
+        Cryptosystem
+        public_key (tuple): The numbers used in an RSA Cryptosystem that can be
+        shown to anyone. Contains n and e
+    '''
+
     def __init__(self, p, q):
         '''Args:
-            p (int): A prime number used in an RSA Cryptosystem
-            q (int): A second prime number different from p used in an RSA
-            Cryptosystem
+            p (int): The first prime number chosen by the user to be used in an
+            RSA Cryptosystem
+            q (int): The second prime number, different from p, chosen by the
+            user to be used in an RSA Cryptosystem
         '''
         
         valid = False
@@ -258,26 +286,42 @@ class RSA():
                     valid = True
                 else:
                     print("q needs to be a prime number that's different from p.")
-                    q = input('Choose another value for p: ')
+                    q = input('Choose another value for q: ')
             elif isinstance(q, str):
                 if q.isnumeric():
                     q = int(q)
                 else:
                     print("q needs to be a prime number that's different from p.")
-                    q = input('Choose another value for p: ')
+                    q = input('Choose another value for q: ')
             elif isinstance(q, float):
                 print("q needs to be a prime number that's different from p.")
-                q = input('Choose another value for p: ')
+                q = input('Choose another value for q: ')
         self.q = q
-        
         self.n = p * q
         self.phi_n = (p-1) * (q-1)
-        e = int(input(f'Choose an invertible element in mod {self.phi_n}: '))
-        invertible, d = is_invertible(e, self.phi_n)
-        while not invertible:
-            print(f'{e} is not invertible in mod {self.phi_n}.')
-            e = int(input(f'Choose an invertible element in mod {self.phi_n}: '))
-            invertible, d = is_invertible(e, self.phi_n)
+        
+        e = input(f'Choose an invertible element in mod {self.phi_n}: ')
+        valid = False
+        while not valid:
+            if isinstance(e, int):
+                invertible, d = is_invertible(e, self.phi_n)
+                if invertible:
+                    valid = True
+                else:
+                    print('e needs to be a whole number that has a '\
+                          f'multiplicative inverse in mod {self.phi_n}.')
+                    e = input('Choose another value for e: ')
+            elif isinstance(e, str):
+                if e.isnumeric():
+                    e = int(e)
+                else:
+                    print('e needs to be a whole number that has a '\
+                          f'multiplicative inverse in mod {self.phi_n}.')
+                    e = input('Choose another value for e: ')
+            elif isinstance(e, float):
+                print('e needs to be a whole number that has a '\
+                        f'multiplicative inverse in mod {self.phi_n}.')
+                e = input('Choose another value for e: ')
         self.e = e
         self.d = d
         self.public_key = (self.n, self.e)
@@ -291,11 +335,49 @@ class RSA():
     
     def encrypt(self, message):
         '''c = m^e (mod n)'''
+        
+        valid = False
+        while not valid:
+            if isinstance(message, int):
+                if message > 0:
+                    valid = True
+                else:
+                    print('Message needs to be a whole number greater than zero.')
+                    message = input('Choose another value for your message: ')
+            elif isinstance(message, str):
+                if message.isnumeric():
+                    message = int(message)
+                else:
+                    print('Message needs to be a whole number greater than zero.')
+                    message = input('Choose another value for your message: ')
+            elif isinstance(p, float):
+                print('Message needs to be a whole number greater than zero.')
+                message = input('Choose another value for your message: ')
+                
         encrypted_message = (message ** self.e) % self.n
         return encrypted_message
 
     def decrypt(self, message):
         '''m = c^d (mod n)'''
+        
+        valid = False
+        while not valid:
+            if isinstance(message, int):
+                if message > 0:
+                    valid = True
+                else:
+                    print('Message needs to be a whole number greater than zero.')
+                    message = input('Choose another value for your message: ')
+            elif isinstance(message, str):
+                if message.isnumeric():
+                    message = int(message)
+                else:
+                    print('Message needs to be a whole number greater than zero.')
+                    message = input('Choose another value for your message: ')
+            elif isinstance(p, float):
+                print('Message needs to be a whole number greater than zero.')
+                message = input('Choose another value for your message: ')
+                
         decrypted_message = (message ** self.d) % self.n
         return decrypted_message
         
