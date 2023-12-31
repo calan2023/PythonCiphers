@@ -13,8 +13,8 @@ All classes have five methods:
             String of all attributes assigned in the class
 
     encrypt(message):
-        Validates user message. Encrypts text letter by letter through using
-        the equation for the cipher and attributes of the class.
+        Encrypts text letter by letter through using the equation for the
+        cipher and attributes of the class.
 
         Args:
             message (str): The plaintext that will be encrypted
@@ -23,8 +23,8 @@ All classes have five methods:
             encrypted_message (str): The ciphertext version of message argument
 
     decrypt(message):
-        Validates user message. Decrypts text letter by letter through using
-        the equation for the cipher and attributes of the class.
+        Decrypts text letter by letter through using the equation for the
+        cipher and attributes of the class.
 
         Args:
             message (str): The ciphertext that will be decrypted
@@ -335,57 +335,55 @@ class RSA():
     
     def encrypt(self, message):
         '''c = m^e (mod n)'''
-        
-        valid = False
-        while not valid:
-            if isinstance(message, int):
-                if message > 0:
-                    valid = True
-                else:
-                    print('Message needs to be a whole number greater than zero.')
-                    message = input('Choose another value for your message: ')
-            elif isinstance(message, str):
-                if message.isnumeric():
-                    message = int(message)
-                else:
-                    print('Message needs to be a whole number greater than zero.')
-                    message = input('Choose another value for your message: ')
-            elif isinstance(p, float):
-                print('Message needs to be a whole number greater than zero.')
-                message = input('Choose another value for your message: ')
+
+        message = message.lower()
+        encrypted_letter_values = []
+        encrypted_message = ''
+        for letter in message:
+            if letter.isalpha():
+                encrypted_letter_value = (LETTER_VALUES[letter] ** self.e) % self.n
+                encrypted_letter_values.append(encrypted_letter_value)
+            elif letter == ' ':
+                encrypted_letter_values.append('_')
+            else:
+                encrypted_letter_values.append(letter)                
                 
-        encrypted_message = (message ** self.e) % self.n
+        for i in range(len(encrypted_letter_values)):
+            if isinstance(encrypted_letter_values[i], int):
+                encrypted_letter_values[i] = str(encrypted_letter_values[i])
+                
+        encrypted_message = ' '.join(encrypted_letter_values)
         return encrypted_message
 
     def decrypt(self, message):
         '''m = c^d (mod n)'''
-        
-        valid = False
-        while not valid:
-            if isinstance(message, int):
-                if message > 0:
-                    valid = True
-                else:
-                    print('Message needs to be a whole number greater than zero.')
-                    message = input('Choose another value for your message: ')
-            elif isinstance(message, str):
-                if message.isnumeric():
-                    message = int(message)
-                else:
-                    print('Message needs to be a whole number greater than zero.')
-                    message = input('Choose another value for your message: ')
-            elif isinstance(p, float):
-                print('Message needs to be a whole number greater than zero.')
-                message = input('Choose another value for your message: ')
-                
-        decrypted_message = (message ** self.d) % self.n
+
+        message = message.split(' ')
+        decrypted_letter_values = []
+        decrypted_message = ''
+        for number in message:
+            if number.isnumeric():
+                decrypted_letter_value = (int(number) ** self.d) % self.n
+                decrypted_letter_values.append(decrypted_letter_value)
+            elif number == '_':
+                decrypted_letter_values.append(' ')
+            else:
+                decrypted_letter_values.append(number)
+
+        for number in decrypted_letter_values:
+            if isinstance(number, int):
+                for key, value in LETTER_VALUES.items():
+                    if number == value:
+                        decrypted_message += key
+            else:
+                decrypted_message += number
+
         return decrypted_message
         
 def is_prime(num):
-    '''Checks if number is prime. If number is less than or equal to 1, or if
-    there exists a number 'i' between 2 and the number given where the number
-    mod 'i' equals 0, then number is not prime. Otherwise, the number will be
-    prime.
+    '''Checks if number is prime. If number is less than 2, or if there exists a
+    number 'i' between 2 and the number given where the number mod 'i' equals 0,
+    then number is not prime. Otherwise, the number will be prime.
 
     Args:
         num (int): The number being checked to see if it's prime
@@ -395,7 +393,7 @@ def is_prime(num):
     '''
     
     prime = True
-    if num <= 1:
+    if num < 2:
         prime = False
     else:
         for i in range(2, num):

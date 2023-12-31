@@ -1,3 +1,7 @@
+'''The main module for running the cipher converter. Used for encrypting and
+decrypting text in text documents.
+'''
+
 from ciphers import *
 
 def get_lines(file):
@@ -18,8 +22,9 @@ def get_lines(file):
 def get_cipher():
     '''Prints available ciphers. Gets and validates users choice. If user chooses
     Caesar cipher, user is asked to enter a key and Caesar class is created. If
-    user chooses Affine cipher user is asked to enter Key A and Key B and Affine
-    class is created.
+    user chooses Affine cipher, user is asked to enter Key A and Key B and Affine
+    class is created. If user chooses RSA, user is asked to enter to prime numbers
+    and RSA Cryptosystem is created.
 
     Returns:
         cipher (class): The cipher chosen by the user
@@ -27,9 +32,10 @@ def get_cipher():
     
     print('''Available Ciphers:
 1: Caesar
-2: Affine''')
+2: Affine
+3: RSA''')
     cipher = input("Choose a cipher: ")
-    while cipher not in ['1', '2']:
+    while cipher not in ['1', '2', '3']:
         print('Invalid. Try again')
         cipher = input("Choose a cipher: ")
         
@@ -40,6 +46,10 @@ def get_cipher():
         a = input('Choose Key A for the Affine cipher: ')
         b = input('Choose Key B for the Affine cipher: ')
         cipher = Affine(a, b)
+    elif cipher == '3':
+        p = input("Choose first prime number for the RSA Cryptosystem: ")
+        q = input("Choose second prime number for the RSA Cryptosystem: ")
+        cipher = RSA(p, q)
     return cipher
             
 def plain_to_cipher():
