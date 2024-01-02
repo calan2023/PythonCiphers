@@ -2,6 +2,7 @@
 decrypting text in text documents.
 '''
 
+import subprocess
 from ciphers import *
 
 def get_lines(file):
@@ -82,30 +83,53 @@ def cipher_to_plain():
 
 def main():
     '''Prints available conversions. Gets and validates users choice. If user
-    chooses 'Plaintext -> Ciphertext', it instructs the user to enter plaintext
-    into plain.txt file, and after pressing ENTER, runs plain_to_cipher() and
-    tells user to open cipher.txt to see ciphertext. If user chooses
-    'Ciphertext -> Plaintext', it instructs the user to enter ciphertext
-    into cipher.txt file, and after pressing ENTER, runs cipher_to_plain() and
-    tells user to open plain.txt to see plaintext.
+    chooses 'Plaintext -> Ciphertext', it opens plain.txt, instructs the user
+    to enter plaintext, and after pressing ENTER, runs plain_to_cipher() and
+    opens cipher.txt to show ciphertext. If user chooses
+    'Ciphertext -> Plaintext', it opens cipher.txt, instructs the user to
+    enter ciphertext, and after pressing ENTER, runs cipher_to_plain() and
+    opens plain.txt to show plaintext. Gets and validates users choice to do
+    another conversion, and closes plain.txt and cipher.txt. If user inputs 'Y',
+    process repeats, and if user inputs 'N', program stops.
     '''
-    
-    print('''Available Conversions:
+
+    running = True
+    while running:
+        print('''Available Conversions:
 1: Plaintext -> Ciphertext
 2: Ciphertext -> Plaintext''')
-    conversion = input("Choose a cipher conversion: ")
-    while conversion not in ['1', '2']:
-        print('Invalid. Try again')
         conversion = input("Choose a cipher conversion: ")
-    print()
-    if conversion == '1':
-        input("Input your plaintext into the plain.txt file and press ENTER to continue.")
-        plain_to_cipher()
-        print("\nOpen the cipher.txt file to see the ciphertext")
-    elif conversion == '2':
-        input("Input your ciphertext into the cipher.txt file and press ENTER to continue.")
-        cipher_to_plain()
-        print("\nOpen the plain.txt file to see the plaintext")
+        while conversion not in ['1', '2']:
+            print('Invalid. Try again')
+            conversion = input("Choose a cipher conversion: ")
+        print()
+        if conversion == '1':
+            first_file = subprocess.Popen('notepad plain.txt')
+            input("Input your plaintext into the plain.txt file, save it, "\
+                  "and press ENTER in terminal to continue.")
+            plain_to_cipher()
+            print("\nYou can now see the ciphertext in cipher.txt.")
+            second_file = subprocess.Popen('notepad cipher.txt')
+        elif conversion == '2':
+            first_file = subprocess.Popen('notepad cipher.txt')
+            input("Input your ciphertext into the cipher.txt file, save it, "\
+                  "and press ENTER in terminal to continue.")
+            cipher_to_plain()
+            print("\nYou can now see the ciphertext in cipher.txt.")
+            second_file = subprocess.Popen('notepad plain.txt')
 
+        again = input("\nWould you like to do another conversion? Enter 'Y' for yes "\
+                      "or 'N' for no: ")
+        while again not in ['Y', 'y', 'N', 'n']:
+            print('Invalid. Try again')
+            again = input("Would you like to do another conversion? Enter 'Y' for yes "\
+                          "or 'N' for no: ")
+        if again in ['Y', 'y']:
+            running = True
+        else:
+            running = False
+        first_file.kill()
+        second_file.kill()
+        
 if __name__ == '__main__':
     main()
