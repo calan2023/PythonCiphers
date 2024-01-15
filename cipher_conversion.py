@@ -81,6 +81,37 @@ def cipher_to_plain():
         outfile.write(plain + '\n')
     outfile.close()
 
+def caesar_cipher_crack():
+    '''Gets lines in cipher.txt file, puts the frequency of each letter in a
+    dictionary, finds which letters are the most common, and for each of those
+    letters, calculates key for Caesar cipher and decrypts each line and writes
+    the decrypted line into plain.txt file.
+    '''
+    
+    frequency = {}
+    lines = get_lines('cipher.txt')
+    for line in lines:
+        for letter in line:
+            if letter in frequency.keys():
+                frequency[letter] += 1
+            else:
+                if letter.isalpha():
+                    frequency[letter] = 1
+    most_frequent = [(' ', 0)]
+    for key, value in frequency.items():
+        if value > most_frequent[0][1]:
+            most_frequent = [(key, value)]
+        elif value == most_frequent[0][1]:
+            most_frequent += [(key, value)]
+    outfile = open('plain.txt', 'a')
+    for i in most_frequent:
+        key = LETTER_VALUES[i[0]] - LETTER_VALUES['e']
+        code = Caesar(key)
+        for line in lines:
+            plain = code.decrypt(line)
+            outfile.write(plain + '\n')
+    outfile.close()
+
 def main():
     '''Prints available conversions. Gets and validates users choice. If user
     chooses 'Plaintext -> Ciphertext', it opens plain.txt, instructs the user
