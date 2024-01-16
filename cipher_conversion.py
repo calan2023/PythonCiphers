@@ -72,16 +72,26 @@ def cipher_to_plain():
     plain.txt file and decrypts each line and writes the decrypted line into
     plain.txt file.
     '''
-    
-    lines = get_lines('cipher.txt')
-    code = get_cipher()
-    outfile = open('plain.txt', 'a')
-    for line in lines:
-        plain = code.decrypt(line)
-        outfile.write(plain + '\n')
-    outfile.close()
 
-def caesar_cipher_crack():
+    lines = get_lines('cipher.txt')
+    knows_cipher = input("\nDo you know the cipher and key that was used to encrypt "\
+                         "this text? Enter 'Y' for yes or 'N' for no: ")
+    while knows_cipher not in ['Y', 'y', 'N', 'n']:
+            print('Invalid. Try again')
+            knows_cipher = input("\nDo you know the cipher and key that was used to encrypt "\
+                                 "this text? Enter 'Y' for yes or 'N' for no: ")
+    if knows_cipher in ['Y', 'y']:
+        code = get_cipher()
+        outfile = open('plain.txt', 'a')
+        for line in lines:
+            plain = code.decrypt(line)
+            outfile.write(plain + '\n')
+        outfile.close()
+    else:
+        caesar_cipher_crack(lines)
+        affine_cipher_crack(lines)
+
+def caesar_cipher_crack(lines):
     '''Gets lines in cipher.txt file, puts the frequency of each letter in a
     dictionary, finds which letters are the most common, and for each of those
     letters, calculates key for Caesar cipher and decrypts each line and writes
@@ -89,13 +99,13 @@ def caesar_cipher_crack():
     '''
     
     frequency = {}
-    lines = get_lines('cipher.txt')
     for line in lines:
+        line = line.lower()
         for letter in line:
             if letter in frequency.keys():
                 frequency[letter] += 1
             else:
-                if letter.isalpha():
+                if letter in LETTER_VALUES.keys():
                     frequency[letter] = 1
     most_frequent = [(' ', 0)]
     for key, value in frequency.items():
@@ -105,11 +115,57 @@ def caesar_cipher_crack():
             most_frequent += [(key, value)]
     outfile = open('plain.txt', 'a')
     for i in most_frequent:
-        key = LETTER_VALUES[i[0]] - LETTER_VALUES['e']
+        key = (LETTER_VALUES[i[0]] - LETTER_VALUES['e']) % NUM_LETTERS
         code = Caesar(key)
         for line in lines:
             plain = code.decrypt(line)
             outfile.write(plain + '\n')
+        outfile.write(f'(Decrypted using Caesar({key}))' + '\n')
+    outfile.close()
+
+def affine_cipher_crack(lines):
+    '''Gets lines in cipher.txt file, puts the frequency of each letter in a
+    dictionary, finds which letters are the most common and second most common,
+    and for each of those letters, calculates Key A and Key B for Affine cipher
+    and decrypts each line and writes the decrypted line into plain.txt file.
+    '''
+    frequency = {}
+    for line in lines:
+        line = line.lower()
+        for letter in line:
+            if letter in frequency.keys():
+                frequency[letter] += 1
+            else:
+                if letter in LETTER_VALUES.keys():
+                    frequency[letter] = 1
+    most_frequent = [(' ', 0)]
+    for key, value in frequency.items():
+        if value > most_frequent[0][1]:
+            most_frequent = [(key, value)]
+        elif value == most_frequent[0][1]:
+            most_frequent += [(key, value)]
+    for i in most_frequent:
+        del frequency[i[0]]
+    next_frequent = [(' ', 0)]
+    for key, value in frequency.items():
+        if value > next_frequent[0][1]:
+            next_frequent = [(key, value)]
+        elif value == next_frequent[0][1]:
+            next_frequent += [(key, value)]
+    outfile = open('plain.txt', 'a')
+    for m in most_frequent:
+        for n in next_frequent:
+            key_a = VALUE_INVERSES[LETTER_VALUES['t'] - LETTER_VALUES['e']]\
+                    * (LETTER_VALUES[n[0]] - LETTER_VALUES[m[0]])\
+                    % NUM_LETTERS
+            key_b = (LETTER_VALUES[m[0]] - (LETTER_VALUES['e'] * key_a))\
+                    % NUM_LETTERS
+            if (key_a in VALUE_INVERSES) and (0 <= key_b <= NUM_LETTERS-1):
+                code = Affine(key_a, key_b)
+                for line in lines:
+                    plain = code.decrypt(line)
+                    outfile.write(plain + '\n')
+                outfile.write(f'(Decrypted using Affine({key_a}, {key_b}))' + '\n')
     outfile.close()
 
 def main():
@@ -146,7 +202,7 @@ def main():
             input("Input your ciphertext into the cipher.txt file, save it, "\
                   "and press ENTER in terminal to continue.")
             cipher_to_plain()
-            print("\nYou can now see the ciphertext in cipher.txt.")
+            print("\nYou can now see the plaintext in plain.txt.")
             second_file = subprocess.Popen('notepad plain.txt')
 
         again = input("\nWould you like to do another conversion? Enter 'Y' for yes "\
