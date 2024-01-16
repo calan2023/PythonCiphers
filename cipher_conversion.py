@@ -68,9 +68,11 @@ def plain_to_cipher():
     outfile.close()
 
 def cipher_to_plain():
-    '''Gets lines in cipher.txt file and gets cipher user wants to use. Opens
+    '''Gets lines in cipher.txt file. Asks user if they know the cipher to decrypt
+    ciphertext. If yes, then it gets cipher user wants to use, opens
     plain.txt file and decrypts each line and writes the decrypted line into
-    plain.txt file.
+    plain.txt file; if no, then it runs caesar_cipher_crack() and affine_cipher_crack()
+    functions.
     '''
 
     lines = get_lines('cipher.txt')
@@ -96,6 +98,9 @@ def caesar_cipher_crack(lines):
     dictionary, finds which letters are the most common, and for each of those
     letters, calculates key for Caesar cipher and decrypts each line and writes
     the decrypted line into plain.txt file.
+
+    Args:
+        lines (list): List containing each line of text in cipher.txt file
     '''
     
     frequency = {}
@@ -128,7 +133,11 @@ def affine_cipher_crack(lines):
     dictionary, finds which letters are the most common and second most common,
     and for each of those letters, calculates Key A and Key B for Affine cipher
     and decrypts each line and writes the decrypted line into plain.txt file.
+
+    Args:
+        lines (list): List containing each line of text in cipher.txt file
     '''
+    
     frequency = {}
     for line in lines:
         line = line.lower()
