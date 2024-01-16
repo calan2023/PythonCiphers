@@ -1,2 +1,14 @@
-this is an example sentence
-for showing ciphers using python.
+my secret text
+(Decrypted using Caesar(23))
+xj dpncpe epie
+(Decrypted using Caesar(12))
+yc aemrej jetj
+(Decrypted using Affine(3, 15))
+tx vzhmze ezoe
+(Decrypted using Affine(3, 4))
+jt blfyle elqe
+(Decrypted using Affine(9, 6))
+fh tvzive evwe
+(Decrypted using Affine(19, 18))
+bv lftsfe efce
+(Decrypted using Affine(11, 24))
