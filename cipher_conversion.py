@@ -90,8 +90,11 @@ def cipher_to_plain():
             outfile.write(plain + '\n')
         outfile.close()
     else:
-        caesar_cipher_crack(lines)
-        affine_cipher_crack(lines)
+        if '_' in lines[0]:
+            print("\nRSA encrypted text cannot be cracked")
+        else:
+            caesar_cipher_crack(lines)
+            affine_cipher_crack(lines)
 
 def caesar_cipher_crack(lines):
     '''Gets lines in cipher.txt file, puts the frequency of each letter in a
