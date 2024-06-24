@@ -58,19 +58,19 @@ class Caesar():
         valid = False
         while not valid:
             if isinstance(key, int):
-                if key > 0:
+                if key >= 0:
                     valid = True
                 else:
-                    print("Key needs to be a whole number greater than zero.")
+                    print("Key needs to be a whole number that is not negative.")
                     key = input("Choose another value for the key: ")
             elif isinstance(key, str):
                 if key.isnumeric():
                     key = int(key)
                 else:
-                    print("Key needs to be a whole number greater than zero.")
+                    print("Key needs to be a whole number that is not negative.")
                     key = input("Choose another value for the key: ")
             elif isinstance(key, float):
-                print("Key needs to be a whole number greater than zero.")
+                print("Key needs to be a whole number that is not negative.")
                 key = input("Choose another value for the key: ")
             
         self.key = key
@@ -231,6 +231,77 @@ class Affine():
                         decrypted_message += key
             else:
                 decrypted_message += number
+
+        return decrypted_message
+
+# Vigenere Cipher ==============================================================
+    
+class Vigenere():
+    '''Attributes:
+        key (str): The key used for shifting letters in a Vigenere cipher
+        caesar_ciphers (list): List of Caesar ciphers used in a Vigenere cipher based
+        on the letters in the key
+    '''
+    
+    def __init__(self, key):
+        '''Args:
+            key (str): The key chosen by the user for shifting letters in a Vigenere cipher
+        '''
+        
+        valid = False
+        while not valid:
+            if not isinstance(key, str):
+                print("Key needs to be a string with no spaces, numbers or other special characters.")
+                key = input("Choose another value for the key: ")
+            else:
+                valid = True
+                for letter in key:
+                    if not letter.isalpha():
+                        valid = False
+                        print("Key needs to be a string with no spaces, numbers or other special characters.")
+                        key = input("Choose another value for the key: ")
+                        
+        self.key = key.lower()
+        self.caesar_ciphers = []
+        
+        key_length = len(self.key)
+        for i in range(key_length):
+            cipher = Caesar(LETTER_VALUES[self.key[i]])
+            self.caesar_ciphers.append(cipher)
+
+    def __str__(self):
+        return f'Key = {self.key}'
+
+    def __repr__(self):
+        return f'Key = {self.key}'
+    
+    def encrypt(self, message):
+        message = message.lower()
+        encrypted_message = ''
+        cipher_index = 0
+        for letter in message:
+            if letter.isalpha():
+                letter_cipher = self.caesar_ciphers[cipher_index]
+                encrypted_letter = letter_cipher.encrypt(letter)
+                encrypted_message += encrypted_letter
+                cipher_index = (cipher_index + 1) % len(self.caesar_ciphers)
+            else:
+                encrypted_message += letter
+
+        return encrypted_message
+
+    def decrypt(self, message):
+        message = message.lower()
+        decrypted_message = ''
+        cipher_index = 0
+        for letter in message:
+            if letter.isalpha():
+                letter_cipher = self.caesar_ciphers[cipher_index]
+                decrypted_letter = letter_cipher.decrypt(letter)
+                decrypted_message += decrypted_letter
+                cipher_index = (cipher_index + 1) % len(self.caesar_ciphers)
+            else:
+                decrypted_message += letter
 
         return decrypted_message
 
