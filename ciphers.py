@@ -83,44 +83,30 @@ class Caesar():
         
     def encrypt(self, message):
         message = message.lower()
-        encrypted_letter_values = []
         encrypted_message = ''
         for letter in message:
             if letter.isalpha():
                 encrypted_letter_value = (LETTER_VALUES[letter] + self.key) % NUM_LETTERS
-                encrypted_letter_values.append(encrypted_letter_value)
-            else:
-                encrypted_letter_values.append(letter)                
-            
-        for number in encrypted_letter_values:
-            if isinstance(number, int):
                 for key, value in LETTER_VALUES.items():
-                    if number == value:
+                    if encrypted_letter_value == value:
                         encrypted_message += key
             else:
-                encrypted_message += number
-
+                encrypted_message += letter               
+            
         return encrypted_message
 
     def decrypt(self, message):
         message = message.lower()
-        decrypted_letter_values = []
         decrypted_message = ''
         for letter in message:
             if letter.isalpha():
                 decrypted_letter_value = (LETTER_VALUES[letter] - self.key) % NUM_LETTERS
-                decrypted_letter_values.append(decrypted_letter_value)
-            else:
-                decrypted_letter_values.append(letter)
-            
-        for number in decrypted_letter_values:
-            if isinstance(number, int):
                 for key, value in LETTER_VALUES.items():
-                    if number == value:
+                    if decrypted_letter_value == value:
                         decrypted_message += key
             else:
-                decrypted_message += number
-
+                decrypted_message += letter
+            
         return decrypted_message
 
 # Affine Cipher ================================================================
@@ -192,45 +178,32 @@ class Affine():
     def encrypt(self, message):
         '''e(x) = ax + b'''
         message = message.lower()
-        encrypted_letter_values = []
         encrypted_message = ''
         for letter in message:
             if letter.isalpha():
                 encrypted_letter_value = ((self.a * LETTER_VALUES[letter]) +
                                           self.b) % NUM_LETTERS
-                encrypted_letter_values.append(encrypted_letter_value)
-            else:
-                encrypted_letter_values.append(letter)                
-                
-        for number in encrypted_letter_values:
-            if isinstance(number, int):
                 for key, value in LETTER_VALUES.items():
-                    if number == value:
+                    if encrypted_letter_value == value:
                         encrypted_message += key
             else:
-                encrypted_message += number
+                encrypted_message += letter
 
         return encrypted_message
 
     def decrypt(self, message):
         '''d(e(x)) = a^(-1)(e(x) - b)'''
         message = message.lower()
-        decrypted_letter_values = []
         decrypted_message = ''
         for letter in message:
             if letter.isalpha():
-                decrypted_letter_value = (VALUE_INVERSES[self.a] * (LETTER_VALUES[letter] - self.b)) % NUM_LETTERS
-                decrypted_letter_values.append(decrypted_letter_value)
-            else:
-                decrypted_letter_values.append(letter)
-
-        for number in decrypted_letter_values:
-            if isinstance(number, int):
+                decrypted_letter_value = (VALUE_INVERSES[self.a] *
+                                          (LETTER_VALUES[letter] - self.b)) % NUM_LETTERS
                 for key, value in LETTER_VALUES.items():
-                    if number == value:
+                    if decrypted_letter_value == value:
                         decrypted_message += key
             else:
-                decrypted_message += number
+                decrypted_message += letter
 
         return decrypted_message
 
@@ -408,44 +381,32 @@ class RSA():
         '''c = m^e (mod n)'''
 
         message = message.lower()
-        encrypted_letter_values = []
-        encrypted_message = ''
+        encrypted_message = []
         for letter in message:
             if letter.isalpha():
                 encrypted_letter_value = (LETTER_VALUES[letter] ** self.e) % self.n
-                encrypted_letter_values.append(encrypted_letter_value)
+                encrypted_message.append(str(encrypted_letter_value))
             elif letter == ' ':
-                encrypted_letter_values.append('_')
+                encrypted_message.append('_')
             else:
-                encrypted_letter_values.append(letter)                
+                encrypted_message.append(letter)
                 
-        for i in range(len(encrypted_letter_values)):
-            if isinstance(encrypted_letter_values[i], int):
-                encrypted_letter_values[i] = str(encrypted_letter_values[i])
-                
-        encrypted_message = ' '.join(encrypted_letter_values)
+        encrypted_message = ' '.join(encrypted_message)                
         return encrypted_message
 
     def decrypt(self, message):
         '''m = c^d (mod n)'''
 
         message = message.split(' ')
-        decrypted_letter_values = []
         decrypted_message = ''
         for number in message:
             if number.isnumeric():
                 decrypted_letter_value = (int(number) ** self.d) % self.n
-                decrypted_letter_values.append(decrypted_letter_value)
-            elif number == '_':
-                decrypted_letter_values.append(' ')
-            else:
-                decrypted_letter_values.append(number)
-
-        for number in decrypted_letter_values:
-            if isinstance(number, int):
                 for key, value in LETTER_VALUES.items():
-                    if number == value:
+                    if decrypted_letter_value == value:
                         decrypted_message += key
+            elif number == '_':
+                decrypted_message += ' '
             else:
                 decrypted_message += number
 
