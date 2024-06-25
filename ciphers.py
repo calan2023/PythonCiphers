@@ -34,6 +34,8 @@ All classes have five methods:
 
 '''
 
+import random
+
 LETTER_VALUES = {'a': 0, 'b': 1, 'c': 2, 'd': 3, 'e': 4, 'f': 5, 'g': 6, 'h': 7,
                  'i': 8, 'j': 9, 'k': 10, 'l': 11, 'm': 12, 'n': 13, 'o': 14,
                  'p': 15, 'q': 16, 'r': 17, 's': 18, 't': 19, 'u': 20, 'v': 21,
@@ -413,26 +415,61 @@ class RSA():
         return decrypted_message
         
 def is_prime(num):
-    '''Checks if number is prime. If number is less than 2, or if there exists a
-    number 'i' between 2 and the number given where the number mod 'i' equals 0,
-    then number is not prime. Otherwise, the number will be prime.
+    '''Checks if number is prime. If number is 2, then it is prime. Otherwise,
+    if number is less than or equal to 1 or number is even, then it is not prime.
+    Otherwise, the Miller-Rabin test is run up to 100 times with a random base.
+    If one of the tests comes back negative, then number is not prime.
+    Otherwise, the number will be prime.
 
     Args:
         num (int): The number being checked to see if it's prime
 
     Returns:
-        prime (bool): The result of whether number is prime
+        True/False (bool): The result of whether number is prime
     '''
     
-    prime = True
-    if num < 2:
-        prime = False
+    if num == 2:
+        return True
+    elif num <= 1 or num % 2 == 0:
+        return False
     else:
-        for i in range(2, num):
-            if num % i == 0:
-                prime = False
-                break
-    return prime
+        for i in range(100):
+            base = random.randint(1, num-1)
+            if miller_rabin_test(num, base) is False:
+                return False
+    return True
+
+def miller_rabin_test(num, base):
+    '''Runs a Miller-Rabin primality test. Gets positive integer 's' and odd
+    positive integer 'd' where num - 1 = 2**s * d. If base**d is congruent to
+    1 mod num, num is prime. Otherwise, for each integer 'r' from 0 to s - 1,
+    if base**(2**r * d) is congruent to -1 mod num, num is prime. Otherwise,
+    num is not prime.
+
+    Args:
+        num (int): The number being checked to see if it's prime
+        base (int): The base number used for checking the primality
+        of the number
+
+    Returns:
+        True/False (bool): The result of whether the number is prime
+    '''
+    
+    s = 1
+    d = None
+    while d is None:
+        if ((num-1) // 2**s) % 2 == 1:
+            d = (num - 1) // 2**s
+        else:
+            s += 1
+
+    if base**d % num == 1:
+        return True
+
+    for r in range(s):
+        if base**(2**r * d) % num == num-1:
+            return True
+    return False
 
 def is_invertible(num, phi_n):
     '''Checks if number has a multiplicative inverse in mod Φ(n). If there exists
