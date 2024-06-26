@@ -56,6 +56,48 @@ def get_cipher():
         q = input("Choose second prime number for the RSA Cryptosystem: ")
         cipher = RSA(p, q)
     return cipher
+
+def get_frequency(lines):
+    '''Gets the number of times each letter appears in a text string.
+
+    Args:
+        lines (str): The text string
+
+    Returns:
+        frequency (dict): Dictionary containing the frequency of each letter
+        in the text string
+    '''
+    
+    frequency = {}
+    for line in lines:
+        line = line.lower()
+        for letter in line:
+            if letter in frequency.keys():
+                frequency[letter] += 1
+            else:
+                if letter in LETTER_VALUES.keys():
+                    frequency[letter] = 1
+    return frequency
+
+def get_most_frequent(frequency):
+    '''Gets the most frequency letter/s and the frequency value/s.
+
+    Args:
+        frequency (dict): Dictionary containing the frequency of each letter
+        in a text string
+
+    Returns:
+        most_frequent (list): A list of tuples containing the most frequent
+        letter/s and the corresponding frequency value/s
+    '''
+    
+    most_frequent = [(' ', 0)]
+    for key, value in frequency.items():
+        if value > most_frequent[0][1]:
+            most_frequent = [(key, value)]
+        elif value == most_frequent[0][1]:
+            most_frequent += [(key, value)]
+    return most_frequent
             
 def plain_to_cipher():
     '''Gets lines in plain.txt file and gets cipher user wants to use. Opens
@@ -110,21 +152,8 @@ def caesar_cipher_crack(lines):
         lines (list): List containing each line of text in cipher.txt file
     '''
     
-    frequency = {}
-    for line in lines:
-        line = line.lower()
-        for letter in line:
-            if letter in frequency.keys():
-                frequency[letter] += 1
-            else:
-                if letter in LETTER_VALUES.keys():
-                    frequency[letter] = 1
-    most_frequent = [(' ', 0)]
-    for key, value in frequency.items():
-        if value > most_frequent[0][1]:
-            most_frequent = [(key, value)]
-        elif value == most_frequent[0][1]:
-            most_frequent += [(key, value)]
+    frequency = get_frequency(lines)
+    most_frequent = get_most_frequent(frequency)
     outfile = open('plain.txt', 'a')
     for i in most_frequent:
         key = (LETTER_VALUES[i[0]] - LETTER_VALUES['e']) % NUM_LETTERS
@@ -145,29 +174,11 @@ def affine_cipher_crack(lines):
         lines (list): List containing each line of text in cipher.txt file
     '''
     
-    frequency = {}
-    for line in lines:
-        line = line.lower()
-        for letter in line:
-            if letter in frequency.keys():
-                frequency[letter] += 1
-            else:
-                if letter in LETTER_VALUES.keys():
-                    frequency[letter] = 1
-    most_frequent = [(' ', 0)]
-    for key, value in frequency.items():
-        if value > most_frequent[0][1]:
-            most_frequent = [(key, value)]
-        elif value == most_frequent[0][1]:
-            most_frequent += [(key, value)]
+    frequency = get_frequency(lines)
+    most_frequent = get_most_frequent(frequency)
     for i in most_frequent:
         del frequency[i[0]]
-    next_frequent = [(' ', 0)]
-    for key, value in frequency.items():
-        if value > next_frequent[0][1]:
-            next_frequent = [(key, value)]
-        elif value == next_frequent[0][1]:
-            next_frequent += [(key, value)]
+    next_frequent = get_most_frequent(frequency)
     outfile = open('plain.txt', 'a')
     for m in most_frequent:
         for n in next_frequent:
