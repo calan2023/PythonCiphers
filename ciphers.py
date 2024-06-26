@@ -463,13 +463,51 @@ def miller_rabin_test(num, base):
         else:
             s += 1
 
-    if base**d % num == 1:
+    if fast_exponentiation(base, d, num) == 1:
         return True
 
     for r in range(s):
-        if base**(2**r * d) % num == num-1:
+        if fast_exponentiation(base, 2**r * d, num) == num-1:
             return True
     return False
+
+def fast_exponentiation(base, exponent, modulus):
+    '''Calculates the equation a**m mod n, where m and n can be large,
+    by using exponentiation by squaring.
+    
+    Args:
+        base (int): The base number 'a' in the calculation
+        exponent (int): The exponent number 'm' in the calculation
+        modulus (int): The modulus 'n' the calculation is computed in
+
+    Returns:
+        final_result (int): The result of the calculation
+    '''
+    
+    binary_exponent = format(exponent, 'b')
+    reverse_binary = binary_exponent[::-1]
+    
+    exponents_list = []
+    for i in range(len(reverse_binary)):
+        if reverse_binary[i] == '1':
+            exponents_list.append(i)
+
+    exponents_list.reverse()
+    max_exponent = exponents_list[0]
+    final_result = 1
+    if exponents_list[-1] == 0:
+        final_result *= base
+        final_result %= modulus
+        exponents_list.pop()
+        
+    squared = base   
+    for k in range(1, max_exponent+1):
+        squared = squared**2 % modulus
+        if k == exponents_list[-1]:
+            final_result *= squared
+            final_result %= modulus
+            exponents_list.pop()
+    return final_result
 
 def is_invertible(num, phi_n):
     '''Checks if number has a multiplicative inverse in mod Φ(n). If there exists
