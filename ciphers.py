@@ -280,6 +280,35 @@ class Vigenere():
 
         return decrypted_message
 
+# Playfair Cipher ==============================================================
+
+class Playfair():
+    ALPHABET = ['a', 'b', 'c', 'd', 'e',
+                'f', 'g', 'h', 'i', 'k',
+                'l', 'm', 'n', 'o', 'p',
+                'q', 'r', 's', 't', 'u',
+                'v', 'w', 'x', 'y', 'z']
+    
+    def __init__(self, key):
+        self.key = key.replace('j', 'i')
+        new_alphabet = list(dict.fromkeys(list(self.key) + Playfair.ALPHABET))
+        self.matrix = []
+        for i in range(5, len(new_alphabet)+1, 5):
+            self.matrix.append(new_alphabet[i-5:i])
+
+    def encrypt(self, message):
+        message = message.lower()
+        split_message = []
+        for i in range(0, len(message)+1, 2):
+            digram = message[i:i+2]
+            if len(digram) == 1:
+                digram += 'x'
+            if digram[0] == digram[1]:
+                message = message[:i+1] + 'x' + message[i+1:]
+                digram = message[i:i+2]
+            split_message.append(digram)
+        print(split_message)
+        
 # RSA Cryptosystem =============================================================
 
 class RSA():
