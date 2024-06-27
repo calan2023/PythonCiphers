@@ -35,6 +35,7 @@ All classes have five methods:
 '''
 
 import random
+import math
 
 LETTER_VALUES = {'a': 0, 'b': 1, 'c': 2, 'd': 3, 'e': 4, 'f': 5, 'g': 6, 'h': 7,
                  'i': 8, 'j': 9, 'k': 10, 'l': 11, 'm': 12, 'n': 13, 'o': 14,
@@ -386,7 +387,7 @@ class RSA():
         encrypted_message = []
         for letter in message:
             if letter.isalpha():
-                encrypted_letter_value = (LETTER_VALUES[letter] ** self.e) % self.n
+                encrypted_letter_value = fast_exponentiation(LETTER_VALUES[letter], self.e, self.n)
                 encrypted_message.append(str(encrypted_letter_value))
             elif letter == ' ':
                 encrypted_message.append('_')
@@ -403,7 +404,7 @@ class RSA():
         decrypted_message = ''
         for number in message:
             if number.isnumeric():
-                decrypted_letter_value = (int(number) ** self.d) % self.n
+                decrypted_letter_value = fast_exponentiation(int(number), self.d, self.n)
                 for key, value in LETTER_VALUES.items():
                     if decrypted_letter_value == value:
                         decrypted_message += key
@@ -510,9 +511,10 @@ def fast_exponentiation(base, exponent, modulus):
     return final_result
 
 def is_invertible(num, phi_n):
-    '''Checks if number has a multiplicative inverse in mod Φ(n). If there exists
-    a number 'i' between 1 and Φ(n) where the number x 'i' mod Φ(n) equals 1,
-    then number is invertible. Otherwise, the number will not be invertible.
+    '''Checks if number has a multiplicative inverse in mod Φ(n) by running
+    the extended Euclidean algorithm. If the greatest common divisor of the
+    number and Φ(n) equals 1, then the number is invertible and returns the
+    multiplicative inverse mod Φ(n). Otehrwise, the number isn't invertible.
 
     Args:
         num (int): The number being checked to see if it's invertible
@@ -522,12 +524,32 @@ def is_invertible(num, phi_n):
         invertible (bool): The result of whether number is invertible
         d (int): The multiplicative inverse of the number in mod Φ(n)
     '''
-    
-    invertible = False
-    d = None
-    for i in range(1, phi_n):
-        if (num * i) % phi_n == 1:
-            invertible = True
-            d = i
-            break
+
+    gcd, x, _ = extended_gcd(num, phi_n)
+    if gcd == 1:
+        invertible = True
+        d = x % phi_n
+    else:
+        invertible = False
+        d = None
     return invertible, d
+
+def extended_gcd(a, n):
+    '''Finds the greatest common divisor of two numbers 'a' and 'n' and finds
+    the two numbers 'x' and 'y' in the equation 'gcd = ax + ny'
+
+    Args:
+        a, n (int): The two numbers used to find the greatest common divisor
+
+    Returns:
+        gcd (int): The greatest common divisor of the two numbers
+        x, y (int): The two numbers in the equation 'gcd = ax + ny'
+    '''
+    if a == 0 : 
+        return n, 0, 1
+    
+    gcd, x1, y1 = extended_gcd(n%a, a) 
+
+    x = y1 - (n//a) * x1 
+    y = x1
+    return gcd, x, y
