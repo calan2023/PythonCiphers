@@ -298,9 +298,10 @@ class Playfair():
             self.matrix.append(new_alphabet[i-5:i])
 
     def encrypt(self, message):
-        message = message.lower()
+        message = message.lower().replace(' ', '')
         split_message = []
-        for i in range(0, len(message)+1, 2):
+        i = 0
+        while i < len(message):
             digram = message[i:i+2]
             if len(digram) == 1:
                 digram += 'x'
@@ -308,7 +309,25 @@ class Playfair():
                 message = message[:i+1] + 'x' + message[i+1:]
                 digram = message[i:i+2]
             split_message.append(digram)
+            i += 2
         print(split_message)
+        new_message = []
+        for digram in split_message:
+            digram_indices = []
+            for letter in digram:
+                for row in range(len(self.matrix)):
+                    if letter in self.matrix[row]:
+                        col = self.matrix[row].index(letter)
+                        digram_indices.append((row, col))
+                        break
+            print(digram_indices)
+            letter1, letter2 = digram_indices[0], digram_indices[1]
+            new_letter1 = self.matrix[letter1[0]][letter2[1]]
+            new_letter2 = self.matrix[letter2[0]][letter1[1]]
+            new_digram = new_letter1 + new_letter2
+            new_message.append(new_digram)
+
+        print(new_message)
         
 # RSA Cryptosystem =============================================================
 
