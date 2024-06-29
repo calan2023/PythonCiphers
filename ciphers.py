@@ -297,8 +297,14 @@ class Playfair():
         for i in range(5, len(new_alphabet)+1, 5):
             self.matrix.append(new_alphabet[i-5:i])
 
+    def __str__(self):
+        return f'Key = {self.key}'
+
+    def __repr__(self):
+        return f'Key = {self.key}'
+
     def encrypt(self, message):
-        message = message.lower().replace(' ', '')
+        message = message.lower().replace('j', 'i').replace(' ', '')
         split_message = []
         i = 0
         while i < len(message):
@@ -310,24 +316,32 @@ class Playfair():
                 digram = message[i:i+2]
             split_message.append(digram)
             i += 2
-        print(split_message)
-        new_message = []
+          
+        encrypted_message = ''
         for digram in split_message:
-            digram_indices = []
+            letter_indices = []
             for letter in digram:
                 for row in range(len(self.matrix)):
                     if letter in self.matrix[row]:
                         col = self.matrix[row].index(letter)
-                        digram_indices.append((row, col))
+                        letter_indices.append((row, col))
                         break
-            print(digram_indices)
-            letter1, letter2 = digram_indices[0], digram_indices[1]
-            new_letter1 = self.matrix[letter1[0]][letter2[1]]
-            new_letter2 = self.matrix[letter2[0]][letter1[1]]
-            new_digram = new_letter1 + new_letter2
-            new_message.append(new_digram)
-
-        print(new_message)
+            
+            letter1, letter2 = letter_indices[0], letter_indices[1]
+            if letter1[0] == letter2[0]:
+                col_size = len(self.matrix)
+                new_letter1 = self.matrix[letter1[0]][(letter1[1]+1)%col_size]
+                new_letter2 = self.matrix[letter2[0]][(letter2[1]+1)%col_size]
+            elif letter1[1] == letter2[1]:
+                row_size = len(self.matrix)
+                new_letter1 = self.matrix[(letter1[0]+1)%row_size][letter1[1]]
+                new_letter2 = self.matrix[(letter2[0]+1)%row_size][letter2[1]]
+            else:
+                new_letter1 = self.matrix[letter1[0]][letter2[1]]
+                new_letter2 = self.matrix[letter2[0]][letter1[1]]
+            encrypted_digram = new_letter1 + new_letter2
+            encrypted_message += encrypted_digram
+        return encrypted_message
         
 # RSA Cryptosystem =============================================================
 
