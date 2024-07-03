@@ -281,6 +281,121 @@ class Vigenere():
 
         return decrypted_message
 
+# Playfair Cipher ==============================================================
+
+class Playfair():
+    ALPHABET = ['a', 'b', 'c', 'd', 'e',
+                'f', 'g', 'h', 'i', 'k',
+                'l', 'm', 'n', 'o', 'p',
+                'q', 'r', 's', 't', 'u',
+                'v', 'w', 'x', 'y', 'z']
+    
+    def __init__(self, key):
+        valid = False
+        while not valid:
+            if not isinstance(key, str):
+                print("Key needs to be a string with no spaces, numbers or other special characters.")
+                key = input("Choose another value for the key: ")
+            else:
+                valid = True
+                for letter in key:
+                    if not letter.isalpha():
+                        valid = False
+                        print("Key needs to be a string with no spaces, numbers or other special characters.")
+                        key = input("Choose another value for the key: ")
+                        break
+        
+        self.key = key.replace('j', 'i')
+        new_alphabet = list(dict.fromkeys(list(self.key) + Playfair.ALPHABET))
+        self.matrix = []
+        for i in range(5, len(new_alphabet)+1, 5):
+            self.matrix.append(new_alphabet[i-5:i])
+
+    def __str__(self):
+        string = f"Key = '{self.key}'"
+        for row in self.matrix:
+            string += f'\n{row}'
+        return string
+
+    def __repr__(self):
+        string = f"Key = '{self.key}'"
+        for row in self.matrix:
+            string += f'\n{row}'
+        return string
+
+    def encrypt(self, message):
+        message = message.lower().replace('j', 'i').replace(' ', '')
+        split_message = []
+        i = 0
+        while i < len(message):
+            digram = message[i:i+2]
+            if len(digram) == 1:
+                digram += 'x'
+            if digram[0] == digram[1]:
+                message = message[:i+1] + 'x' + message[i+1:]
+                digram = message[i:i+2]
+            split_message.append(digram)
+            i += 2
+          
+        encrypted_message = ''
+        for digram in split_message:
+            letter_indices = []
+            for letter in digram:
+                for row in range(len(self.matrix)):
+                    if letter in self.matrix[row]:
+                        col = self.matrix[row].index(letter)
+                        letter_indices.append((row, col))
+                        break
+            
+            letter1, letter2 = letter_indices[0], letter_indices[1]
+            if letter1[0] == letter2[0]:
+                col_size = len(self.matrix)
+                new_letter1 = self.matrix[letter1[0]][(letter1[1]+1)%col_size]
+                new_letter2 = self.matrix[letter2[0]][(letter2[1]+1)%col_size]
+            elif letter1[1] == letter2[1]:
+                row_size = len(self.matrix)
+                new_letter1 = self.matrix[(letter1[0]+1)%row_size][letter1[1]]
+                new_letter2 = self.matrix[(letter2[0]+1)%row_size][letter2[1]]
+            else:
+                new_letter1 = self.matrix[letter1[0]][letter2[1]]
+                new_letter2 = self.matrix[letter2[0]][letter1[1]]
+            encrypted_digram = new_letter1 + new_letter2
+            encrypted_message += encrypted_digram
+        return encrypted_message
+
+    def decrypt(self, message):
+        message = message.lower()
+        split_message = []
+        for i in range(0, len(message)-1, 2):
+            digram = message[i:i+2]
+            split_message.append(digram)
+
+        decrypted_message = ''
+        for digram in split_message:
+            letter_indices = []
+            for letter in digram:
+                for row in range(len(self.matrix)):
+                    if letter in self.matrix[row]:
+                        col = self.matrix[row].index(letter)
+                        letter_indices.append((row, col))
+                        break
+
+            letter1, letter2 = letter_indices[0], letter_indices[1]
+            if letter1[0] == letter2[0]:
+                col_size = len(self.matrix)
+                new_letter1 = self.matrix[letter1[0]][(letter1[1]-1)%col_size]
+                new_letter2 = self.matrix[letter2[0]][(letter2[1]-1)%col_size]
+            elif letter1[1] == letter2[1]:
+                row_size = len(self.matrix)
+                new_letter1 = self.matrix[(letter1[0]-1)%row_size][letter1[1]]
+                new_letter2 = self.matrix[(letter2[0]-1)%row_size][letter2[1]]
+            else:
+                new_letter1 = self.matrix[letter1[0]][letter2[1]]
+                new_letter2 = self.matrix[letter2[0]][letter1[1]]
+            decrypted_digram = new_letter1 + new_letter2
+            decrypted_message += decrypted_digram
+        return decrypted_message
+        
 # RSA Cryptosystem =============================================================
 
 class RSA():
