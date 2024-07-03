@@ -35,9 +35,10 @@ def get_cipher():
 1: Caesar
 2: Affine
 3: Vigenere
-4: RSA''')
+4: Playfair
+5: RSA''')
     cipher = input("Choose a cipher: ")
-    while cipher not in ['1', '2', '3', '4']:
+    while cipher not in ['1', '2', '3', '4', '5']:
         print('Invalid. Try again')
         cipher = input("Choose a cipher: ")
         
@@ -52,6 +53,9 @@ def get_cipher():
         key = input("Choose a key for the Vigenere cipher: ")
         cipher = Vigenere(key)
     elif cipher == '4':
+        key = input("Choose a key for the Playfair cipher: ")
+        cipher = Playfair(key)
+    elif cipher == '5':
         p = input("Choose first prime number for the RSA Cryptosystem: ")
         q = input("Choose second prime number for the RSA Cryptosystem: ")
         cipher = RSA(p, q)
