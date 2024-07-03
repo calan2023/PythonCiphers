@@ -284,6 +284,13 @@ class Vigenere():
 # Playfair Cipher ==============================================================
 
 class Playfair():
+    '''Attributes:
+        ALPHABET (list): All letters in the English alphabet (except 'j')
+        key (str): The key used for creating a matrix of letters in a Playfair
+        cipher
+        matrix (list): 5x5 matrix used in a Playfair cipher
+    '''
+    
     ALPHABET = ['a', 'b', 'c', 'd', 'e',
                 'f', 'g', 'h', 'i', 'k',
                 'l', 'm', 'n', 'o', 'p',
@@ -291,6 +298,11 @@ class Playfair():
                 'v', 'w', 'x', 'y', 'z']
     
     def __init__(self, key):
+        '''Args:
+            key (str): The key chosen by the user for creating a matrix of letters
+            in a Playfair cipher
+        '''
+        
         valid = False
         while not valid:
             if not isinstance(key, str):
@@ -325,6 +337,9 @@ class Playfair():
 
     def encrypt(self, message):
         message = message.lower().replace('j', 'i').replace(' ', '')
+        for letter in message:
+            if not letter.isalpha():
+                return message
         split_message = []
         i = 0
         while i < len(message):
@@ -365,6 +380,9 @@ class Playfair():
 
     def decrypt(self, message):
         message = message.lower()
+        for letter in message:
+            if not letter.isalpha():
+                return message
         split_message = []
         for i in range(0, len(message)-1, 2):
             digram = message[i:i+2]
