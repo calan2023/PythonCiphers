@@ -304,7 +304,7 @@ class Playfair():
                         print("Key needs to be a string with no spaces, numbers or other special characters.")
                         key = input("Choose another value for the key: ")
                         break
-                        
+        
         self.key = key.replace('j', 'i')
         new_alphabet = list(dict.fromkeys(list(self.key) + Playfair.ALPHABET))
         self.matrix = []
