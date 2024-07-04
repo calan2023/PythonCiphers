@@ -1,5 +1,5 @@
 this is an example sentence
-for showing ciphers using python
+for showing ciphers using python.
 
-thisisanexamplesentencex
-forshowingciphersusingpython
+this is an examplex sentence
+forx showingx ciphersx usingx python.
