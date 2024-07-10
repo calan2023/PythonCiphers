@@ -40,6 +40,7 @@ LETTER_VALUES = {'a': 0, 'b': 1, 'c': 2, 'd': 3, 'e': 4, 'f': 5, 'g': 6, 'h': 7,
                  'i': 8, 'j': 9, 'k': 10, 'l': 11, 'm': 12, 'n': 13, 'o': 14,
                  'p': 15, 'q': 16, 'r': 17, 's': 18, 't': 19, 'u': 20, 'v': 21,
                  'w': 22, 'x': 23, 'y': 24, 'z': 25}
+VALUE_LETTERS = {value: key for key, value in LETTER_VALUES.items()}
 VALUE_INVERSES = {1: 1, 3: 9, 5: 21, 7: 15, 9: 3, 11: 19, 15: 7, 17: 23, 19: 11,
                   21: 5, 23: 17, 25: 25}
 NUM_LETTERS = 26
@@ -89,9 +90,7 @@ class Caesar():
         for letter in message:
             if letter.isalpha():
                 encrypted_letter_value = (LETTER_VALUES[letter] + self.key) % NUM_LETTERS
-                for key, value in LETTER_VALUES.items():
-                    if encrypted_letter_value == value:
-                        encrypted_message += key
+                encrypted_message += VALUE_LETTERS[encrypted_letter_value]
             else:
                 encrypted_message += letter               
             
@@ -103,9 +102,7 @@ class Caesar():
         for letter in message:
             if letter.isalpha():
                 decrypted_letter_value = (LETTER_VALUES[letter] - self.key) % NUM_LETTERS
-                for key, value in LETTER_VALUES.items():
-                    if decrypted_letter_value == value:
-                        decrypted_message += key
+                decrypted_message += VALUE_LETTERS[decrypted_letter_value]
             else:
                 decrypted_message += letter
             
@@ -185,9 +182,7 @@ class Affine():
             if letter.isalpha():
                 encrypted_letter_value = ((self.a * LETTER_VALUES[letter]) +
                                           self.b) % NUM_LETTERS
-                for key, value in LETTER_VALUES.items():
-                    if encrypted_letter_value == value:
-                        encrypted_message += key
+                encrypted_message += VALUE_LETTERS[encrypted_letter_value]
             else:
                 encrypted_message += letter
 
@@ -201,9 +196,7 @@ class Affine():
             if letter.isalpha():
                 decrypted_letter_value = (VALUE_INVERSES[self.a] *
                                           (LETTER_VALUES[letter] - self.b)) % NUM_LETTERS
-                for key, value in LETTER_VALUES.items():
-                    if decrypted_letter_value == value:
-                        decrypted_message += key
+                decrypted_message += VALUE_LETTERS[decrypted_letter_value]
             else:
                 decrypted_message += letter
 
@@ -569,9 +562,7 @@ Public key = {self.public_key}'''
         for number in message:
             if number.isnumeric():
                 decrypted_letter_value = fast_exponentiation(int(number), self.d, self.n)
-                for key, value in LETTER_VALUES.items():
-                    if decrypted_letter_value == value:
-                        decrypted_message += key
+                decrypted_message += VALUE_LETTERS[decrypted_letter_value]
             elif number == '_':
                 decrypted_message += ' '
             else:
@@ -669,86 +660,47 @@ class Rabin():
                 x3 = (-b*self.p*u + a*self.q*v) % self.n
                 x4 = (-b*self.p*u - a*self.q*v) % self.n
                 solutions = [x1, x2, x3, x4]
-                
-                valid_solutions = []
-                for solution in solutions:
-                    if solution < NUM_LETTERS and solution not in valid_solutions:
-                        valid_solutions.append(solution)
+                valid_solutions = list({solution for solution in solutions\
+                                        if solution < NUM_LETTERS})
                         
                 if len(valid_solutions) == 1:
-                    for key, value in LETTER_VALUES.items():
-                        if valid_solutions[0] == value:
-                            for i in range(len(decrypted_messages)):
-                                decrypted_messages[i] += key
+                    for i in range(len(decrypted_messages)):
+                        decrypted_messages[i] += VALUE_LETTERS[valid_solutions[0]]
                                 
                 elif len(valid_solutions) == 2:
                     decrypted_messages_copy = decrypted_messages[:]
-                    for key, value in LETTER_VALUES.items():
-                        if valid_solutions[0] == value:
-                            for i in range(len(decrypted_messages)):
-                                decrypted_messages[i] += key
-                                
-                    for key, value in LETTER_VALUES.items():
-                        if valid_solutions[1] == value:
-                            for i in range(len(decrypted_messages_copy)):
-                                decrypted_messages_copy[i] += key
+                    for i in range(len(decrypted_messages)):
+                        decrypted_messages[i] += VALUE_LETTERS[valid_solutions[0]]
+                        decrypted_messages_copy[i] += VALUE_LETTERS[valid_solutions[1]]
                     decrypted_messages += decrypted_messages_copy
                     
                 elif len(valid_solutions) == 3:
-                    decrypted_messages_copy1 = decrypted_messages[:]
-                    decrypted_messages_copy2 = decrypted_messages[:]
-                    
-                    for key, value in LETTER_VALUES.items():
-                        if valid_solutions[0] == value:
-                            for i in range(len(decrypted_messages)):
-                                decrypted_messages[i] += key
-                                
-                    for key, value in LETTER_VALUES.items():
-                        if valid_solutions[1] == value:
-                            for i in range(len(decrypted_messages_copy1)):
-                                decrypted_messages_copy1[i] += key
-                                
-                    for key, value in LETTER_VALUES.items():
-                        if valid_solutions[2] == value:
-                            for i in range(len(decrypted_messages_copy2)):
-                                decrypted_messages_copy2[i] += key
-                                
-                    decrypted_messages += decrypted_messages_copy1 +\
-                                          decrypted_messages_copy2
+                    decrypted_messages_copy1 = decrypted_messages_copy2\
+                                               = decrypted_messages[:]
+                    for i in range(len(decrypted_messages)):
+                        decrypted_messages[i] += VALUE_LETTERS[valid_solutions[0]]
+                        decrypted_messages_copy1[i] += VALUE_LETTERS[valid_solutions[1]]
+                        decrypted_messages_copy2[i] += VALUE_LETTERS[valid_solutions[2]]         
+                    decrypted_messages += decrypted_messages_copy1\
+                                          + decrypted_messages_copy2
 
                 elif len(valid_solutions) == 4:
-                    decrypted_messages_copy1 = decrypted_messages[:]
-                    decrypted_messages_copy2 = decrypted_messages[:]
-                    decrypted_messages_copy3 = decrypted_messages[:]
-                    
-                    for key, value in LETTER_VALUES.items():
-                        if valid_solutions[0] == value:
-                            for i in range(len(decrypted_messages)):
-                                decrypted_messages[i] += key
-                                
-                    for key, value in LETTER_VALUES.items():
-                        if valid_solutions[1] == value:
-                            for i in range(len(decrypted_messages_copy1)):
-                                decrypted_messages_copy1[i] += key
-                                
-                    for key, value in LETTER_VALUES.items():
-                        if valid_solutions[2] == value:
-                            for i in range(len(decrypted_messages_copy2)):
-                                decrypted_messages_copy2[i] += key
-
-                    for key, value in LETTER_VALUES.items():
-                        if valid_solutions[3] == value:
-                            for i in range(len(decrypted_messages_copy3)):
-                                decrypted_messages_copy3[i] += key
-                                
-                    decrypted_messages += decrypted_messages_copy1 +\
-                                          decrypted_messages_copy2 +\
-                                          decrypted_messages_copy3
-                
+                    decrypted_messages_copy1 = decrypted_messages_copy2\
+                                               = decrypted_messages_copy3\
+                                               = decrypted_messages[:]
+                    for i in range(len(decrypted_messages)):
+                        decrypted_messages[i] += VALUE_LETTERS[valid_solutions[0]]
+                        decrypted_messages_copy1[i] += VALUE_LETTERS[valid_solutions[1]]
+                        decrypted_messages_copy2[i] += VALUE_LETTERS[valid_solutions[2]]
+                        decrypted_messages_copy3[i] += VALUE_LETTERS[valid_solutions[3]]           
+                    decrypted_messages += decrypted_messages_copy1\
+                                          + decrypted_messages_copy2\
+                                          + decrypted_messages_copy3
             elif number == '_':
                 for i in range(len(decrypted_messages)):
                     decrypted_messages[i] += ' '
             else:
                 for i in range(len(decrypted_messages)):
                     decrypted_messages[i] += number
+        decrypted_messages = '/'.join(decrypted_messages)
         return decrypted_messages
