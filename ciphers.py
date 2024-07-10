@@ -34,7 +34,7 @@ All classes have five methods:
 
 '''
 
-from extra_functions import is_prime, fast_exponentiation, is_invertible
+from extra_functions import is_prime, fast_exponentiation, is_invertible, extended_gcd
 
 LETTER_VALUES = {'a': 0, 'b': 1, 'c': 2, 'd': 3, 'e': 4, 'f': 5, 'g': 6, 'h': 7,
                  'i': 8, 'j': 9, 'k': 10, 'l': 11, 'm': 12, 'n': 13, 'o': 14,
@@ -578,3 +578,177 @@ Public key = {self.public_key}'''
                 decrypted_message += number
 
         return decrypted_message
+
+# Rabin Cipher =============================================================
+
+class Rabin():
+    def __init__(self, p, q):
+        '''Args:
+            p (int): The first prime number chosen by the user to be used in an
+            RSA Cryptosystem
+            q (int): The second prime number, different from p, chosen by the
+            user to be used in an RSA Cryptosystem
+        '''
+        
+        valid = False
+        while not valid:
+            if isinstance(p, int):
+                if is_prime(p):
+                    valid = True
+                else:
+                    print('p needs to be a prime number.')
+                    p = input('Choose another value for p: ')
+            elif isinstance(p, str):
+                if p.isnumeric():
+                    p = int(p)
+                else:
+                    print('p needs to be a prime number.')
+                    p = input('Choose another value for p: ')
+            elif isinstance(p, float):
+                print('p needs to be a prime number.')
+                p = input('Choose another value for p: ')
+        self.p = p
+        
+        valid = False
+        while not valid:
+            if isinstance(q, int):
+                if is_prime(q) and q != self.p:
+                    valid = True
+                else:
+                    print("q needs to be a prime number that's different from p.")
+                    q = input('Choose another value for q: ')
+            elif isinstance(q, str):
+                if q.isnumeric():
+                    q = int(q)
+                else:
+                    print("q needs to be a prime number that's different from p.")
+                    q = input('Choose another value for q: ')
+            elif isinstance(q, float):
+                print("q needs to be a prime number that's different from p.")
+                q = input('Choose another value for q: ')
+        self.q = q
+        self.n = p * q
+
+    def __str__(self):
+        return f'p = {self.p}\nq = {self.q}\nn = {self.n}'
+
+    def __repr__(self):
+        return f'p = {self.p}\nq = {self.q}\nn = {self.n}'
+
+    def encrypt(self, message):
+        message = message.lower()
+        encrypted_message = []
+        for letter in message:
+            if letter.isalpha():
+                encrypted_letter_value = fast_exponentiation(LETTER_VALUES[letter], 2, self.n)
+                encrypted_message.append(str(encrypted_letter_value))
+            elif letter == ' ':
+                encrypted_message.append('_')
+            else:
+                encrypted_message.append(letter)
+                
+        encrypted_message = ' '.join(encrypted_message)
+        return encrypted_message
+
+    def decrypt(self, message):
+        message = message.split(' ')
+        decrypted_messages = ['']
+        for number in message:
+            if number.isnumeric():
+                a_squared = int(number) % self.p
+                b_squared = int(number) % self.q
+                a = 1
+                while fast_exponentiation(a, 2, self.p) != a_squared:
+                    a += 1
+                b = 1
+                while fast_exponentiation(b, 2, self.q) != b_squared:
+                    b += 1
+                gcd, u, v = extended_gcd(self.p, self.q)
+                x1 = (b*self.p*u + a*self.q*v) % self.n
+                x2 = (b*self.p*u - a*self.q*v) % self.n
+                x3 = (-b*self.p*u + a*self.q*v) % self.n
+                x4 = (-b*self.p*u - a*self.q*v) % self.n
+                solutions = [x1, x2, x3, x4]
+                
+                valid_solutions = []
+                for solution in solutions:
+                    if solution < NUM_LETTERS and solution not in valid_solutions:
+                        valid_solutions.append(solution)
+                        
+                if len(valid_solutions) == 1:
+                    for key, value in LETTER_VALUES.items():
+                        if valid_solutions[0] == value:
+                            for i in range(len(decrypted_messages)):
+                                decrypted_messages[i] += key
+                                
+                elif len(valid_solutions) == 2:
+                    decrypted_messages_copy = decrypted_messages[:]
+                    for key, value in LETTER_VALUES.items():
+                        if valid_solutions[0] == value:
+                            for i in range(len(decrypted_messages)):
+                                decrypted_messages[i] += key
+                                
+                    for key, value in LETTER_VALUES.items():
+                        if valid_solutions[1] == value:
+                            for i in range(len(decrypted_messages_copy)):
+                                decrypted_messages_copy[i] += key
+                    decrypted_messages += decrypted_messages_copy
+                    
+                elif len(valid_solutions) == 3:
+                    decrypted_messages_copy1 = decrypted_messages[:]
+                    decrypted_messages_copy2 = decrypted_messages[:]
+                    
+                    for key, value in LETTER_VALUES.items():
+                        if valid_solutions[0] == value:
+                            for i in range(len(decrypted_messages)):
+                                decrypted_messages[i] += key
+                                
+                    for key, value in LETTER_VALUES.items():
+                        if valid_solutions[1] == value:
+                            for i in range(len(decrypted_messages_copy1)):
+                                decrypted_messages_copy1[i] += key
+                                
+                    for key, value in LETTER_VALUES.items():
+                        if valid_solutions[2] == value:
+                            for i in range(len(decrypted_messages_copy2)):
+                                decrypted_messages_copy2[i] += key
+                                
+                    decrypted_messages += decrypted_messages_copy1 +\
+                                          decrypted_messages_copy2
+
+                elif len(valid_solutions) == 4:
+                    decrypted_messages_copy1 = decrypted_messages[:]
+                    decrypted_messages_copy2 = decrypted_messages[:]
+                    decrypted_messages_copy3 = decrypted_messages[:]
+                    
+                    for key, value in LETTER_VALUES.items():
+                        if valid_solutions[0] == value:
+                            for i in range(len(decrypted_messages)):
+                                decrypted_messages[i] += key
+                                
+                    for key, value in LETTER_VALUES.items():
+                        if valid_solutions[1] == value:
+                            for i in range(len(decrypted_messages_copy1)):
+                                decrypted_messages_copy1[i] += key
+                                
+                    for key, value in LETTER_VALUES.items():
+                        if valid_solutions[2] == value:
+                            for i in range(len(decrypted_messages_copy2)):
+                                decrypted_messages_copy2[i] += key
+
+                    for key, value in LETTER_VALUES.items():
+                        if valid_solutions[3] == value:
+                            for i in range(len(decrypted_messages_copy3)):
+                                decrypted_messages_copy3[i] += key
+                                
+                    decrypted_messages += decrypted_messages_copy1 +\
+                                          decrypted_messages_copy2 +\
+                                          decrypted_messages_copy3
+                
+            elif number == '_':
+                for i in range(len(decrypted_messages)):
+                    decrypted_messages[i] += ' '
+            else:
+                for i in range(len(decrypted_messages)):
+                    decrypted_messages[i] += number
+        return decrypted_messages
