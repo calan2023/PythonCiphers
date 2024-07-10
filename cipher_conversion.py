@@ -36,9 +36,10 @@ def get_cipher():
 2: Affine
 3: Vigenere
 4: Playfair
-5: RSA''')
+5: RSA
+6: Rabin''')
     cipher = input("Choose a cipher: ")
-    while cipher not in ['1', '2', '3', '4', '5']:
+    while cipher not in ['1', '2', '3', '4', '5', '6']:
         print('Invalid. Try again')
         cipher = input("Choose a cipher: ")
         
@@ -59,6 +60,10 @@ def get_cipher():
         p = input("Choose first prime number for the RSA Cryptosystem: ")
         q = input("Choose second prime number for the RSA Cryptosystem: ")
         cipher = RSA(p, q)
+    elif cipher == '6':
+        p = input("Choose first prime number for the Rabin cipher: ")
+        q = input("Choose second prime number for the Rabin cipher: ")
+        cipher = Rabin(p, q)
     return cipher
 
 def get_frequency(lines):
