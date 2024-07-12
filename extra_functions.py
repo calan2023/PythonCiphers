@@ -1,10 +1,85 @@
-'''The module containing extra functions used in other modules for checking if
-a number is prime, checking if a number is invertible, and doing fast
-exponentiation calculations.
+'''The module containing extra functions used in other modules for getting a
+valid key, checking if a number is prime, checking if a number is invertible,
+and doing fast exponentiation calculations.
 '''
 
 import random
 
+def valid_int_key(key, condition_true, error_prompt=None, input_prompt=None):
+    '''Checks if a key is a valid integer and, if it's not, continually asks the
+    user to input a new key until the input is valid.
+
+    Args:
+        key (int/str/float): The key the user inputs at first
+        condition_true (function): If the key is an integer, returns if the
+        key meets the condition in order for it to be valid
+        error_prompt (str): The error message shown if key is not valid
+            (default is None)
+        input_prompt (str): The input message that asks for a new key
+            (default is None)
+
+    Returns:
+        key (int): The valid key
+    '''
+    
+    if error_prompt is None:
+        error_prompt = "Key needs to be a whole number that is not negative."
+    if input_prompt is None:
+        input_prompt = "Choose another value for the key: "
+        
+    valid = False
+    while not valid:
+        if isinstance(key, int):
+            if condition_true(key):
+                valid = True
+            else:
+                print(error_prompt)
+                key = input(input_prompt)
+        elif isinstance(key, str):
+            if key.isnumeric():
+                key = int(key)
+            else:
+                print(error_prompt)
+                key = input(input_prompt)
+        elif isinstance(key, float):
+            print(error_prompt)
+            key = input(input_prompt)
+    return key
+
+def valid_str_key(key, error_prompt=None, input_prompt=None):
+    '''Checks if a key is a valid string and, if it's not, continually asks the
+    user to input a new key until the input is valid.
+
+    Args:
+        key (str/int/float): The key the user inputs at first
+        error_prompt (str): The error message shown if key is not valid
+            (default is None)
+        input_prompt (str): The input message that asks for a new key
+            (default is None)
+
+    Returns:
+        key (str): The valid key
+    '''
+    
+    if error_prompt is None:
+        error_prompt = "Key needs to be a string with no spaces, "\
+                       "numbers or other special characters."
+    if input_prompt is None:
+        input_prompt = "Choose another value for the key: "
+        
+    valid = False
+    while not valid:
+        if not isinstance(key, str):
+            print(error_prompt)
+            key = input(input_prompt)
+        else:
+            valid = True
+            if not key.isalpha():
+                valid = False
+                print(error_prompt)
+                key = input(input_prompt)
+    return key
+                
 def is_prime(num):
     '''Checks if number is prime. If number is 2, then it is prime. Otherwise,
     if number is less than or equal to 1 or number is even, then it is not prime.

@@ -34,7 +34,7 @@ All classes have five methods:
 
 '''
 
-from extra_functions import is_prime, fast_exponentiation, is_invertible, extended_gcd
+from extra_functions import *
 
 LETTER_VALUES = {'a': 0, 'b': 1, 'c': 2, 'd': 3, 'e': 4, 'f': 5, 'g': 6, 'h': 7,
                  'i': 8, 'j': 9, 'k': 10, 'l': 11, 'm': 12, 'n': 13, 'o': 14,
@@ -58,25 +58,8 @@ class Caesar():
             Caesar cipher
         '''
         
-        valid = False
-        while not valid:
-            if isinstance(key, int):
-                if key >= 0:
-                    valid = True
-                else:
-                    print("Key needs to be a whole number that is not negative.")
-                    key = input("Choose another value for the key: ")
-            elif isinstance(key, str):
-                if key.isnumeric():
-                    key = int(key)
-                else:
-                    print("Key needs to be a whole number that is not negative.")
-                    key = input("Choose another value for the key: ")
-            elif isinstance(key, float):
-                print("Key needs to be a whole number that is not negative.")
-                key = input("Choose another value for the key: ")
-            
-        self.key = key
+        condition = lambda key: key >= 0
+        self.key = valid_int_key(key, condition)
 
     def __str__(self):
         return f'Key = {self.key}'
@@ -126,47 +109,16 @@ class Affine():
             a and value of letter in an Affine cipher
         '''
         
-        valid = False
-        while not valid:
-            if isinstance(a, int):
-                if a in VALUE_INVERSES:
-                    valid = True
-                else:
-                    print('Key A needs to be a whole number greater than zero '\
-                          'with an inverse in mod 26.')
-                    a = input('Choose another value for Key A: ')
-            elif isinstance(a, str):
-                if a.isnumeric():
-                    a = int(a)
-                else:
-                    print('Key A needs to be a whole number greater than zero '\
-                          'with an inverse in mod 26.')
-                    a = input('Choose another value for Key A: ')
-            elif isinstance(a, float):
-                print('Key A needs to be a whole number greater than zero '\
-                          'with an inverse in mod 26.')
-                a = input('Choose another value for Key A: ')
+        condition = lambda a: a in VALUE_INVERSES
+        error_prompt = 'Key A needs to be a whole number greater than zero '\
+                        'with an inverse in mod 26.'
+        input_prompt = 'Choose another value for Key A: '
+        self.a = valid_int_key(a, condition, error_prompt, input_prompt)
 
-        valid = False
-        while not valid:
-            if isinstance(b, int):
-                if 0 <= b <= NUM_LETTERS-1:
-                    valid = True
-                else:
-                    print('Key B needs to be a whole number between 0 and 25.')
-                    b = input('Choose another value for Key B: ')
-            elif isinstance(b, str):
-                if b.isnumeric():
-                    b = int(b)
-                else:
-                    print('Key B needs to be a whole number between 0 and 25.')
-                    b = input('Choose another value for Key B: ')
-            elif isinstance(b, float):
-                print('Key B needs to be a whole number between 0 and 25.')
-                b = input('Choose another value for Key B: ')
-
-        self.a = a
-        self.b = b
+        condition = lambda b: 0 <= b <= NUM_LETTERS-1
+        error_prompt = 'Key B needs to be a whole number between 0 and 25.'
+        input_prompt = 'Choose another value for Key B: '
+        self.b = valid_int_key(b, condition, error_prompt, input_prompt)
 
     def __str__(self):
         return f'a = {self.a}\nb = {self.b}'
@@ -216,22 +168,8 @@ class Vigenere():
             key (str): The key chosen by the user for shifting letters in a Vigenere cipher
         '''
         
-        valid = False
-        while not valid:
-            if not isinstance(key, str):
-                print("Key needs to be a string with no spaces, numbers or other special characters.")
-                key = input("Choose another value for the key: ")
-            else:
-                valid = True
-                for letter in key:
-                    if not letter.isalpha():
-                        valid = False
-                        print("Key needs to be a string with no spaces, numbers or other special characters.")
-                        key = input("Choose another value for the key: ")
-                        
-        self.key = key.lower()
+        self.key = valid_str_key(key).lower()
         self.caesar_ciphers = []
-        
         key_length = len(self.key)
         for i in range(key_length):
             cipher = Caesar(LETTER_VALUES[self.key[i]])
@@ -295,21 +233,7 @@ class Playfair():
             in a Playfair cipher
         '''
         
-        valid = False
-        while not valid:
-            if not isinstance(key, str):
-                print("Key needs to be a string with no spaces, numbers or other special characters.")
-                key = input("Choose another value for the key: ")
-            else:
-                valid = True
-                for letter in key:
-                    if not letter.isalpha():
-                        valid = False
-                        print("Key needs to be a string with no spaces, numbers or other special characters.")
-                        key = input("Choose another value for the key: ")
-                        break
-        
-        self.key = key.replace('j', 'i')
+        self.key = valid_str_key(key).lower().replace('j', 'i')
         new_alphabet = list(dict.fromkeys(list(self.key) + Playfair.ALPHABET))
         self.matrix = []
         for i in range(5, len(new_alphabet)+1, 5):
@@ -452,70 +376,25 @@ class RSA():
             user to be used in an RSA Cryptosystem
         '''
         
-        valid = False
-        while not valid:
-            if isinstance(p, int):
-                if is_prime(p):
-                    valid = True
-                else:
-                    print('p needs to be a prime number.')
-                    p = input('Choose another value for p: ')
-            elif isinstance(p, str):
-                if p.isnumeric():
-                    p = int(p)
-                else:
-                    print('p needs to be a prime number.')
-                    p = input('Choose another value for p: ')
-            elif isinstance(p, float):
-                print('p needs to be a prime number.')
-                p = input('Choose another value for p: ')
-        self.p = p
+        condition = lambda p: is_prime(p)
+        error_prompt = 'p needs to be a prime number.'
+        input_prompt = 'Choose another value for p: '
+        self.p = valid_int_key(p, condition, error_prompt, input_prompt)
         
-        valid = False
-        while not valid:
-            if isinstance(q, int):
-                if is_prime(q) and q != self.p:
-                    valid = True
-                else:
-                    print("q needs to be a prime number that's different from p.")
-                    q = input('Choose another value for q: ')
-            elif isinstance(q, str):
-                if q.isnumeric():
-                    q = int(q)
-                else:
-                    print("q needs to be a prime number that's different from p.")
-                    q = input('Choose another value for q: ')
-            elif isinstance(q, float):
-                print("q needs to be a prime number that's different from p.")
-                q = input('Choose another value for q: ')
-        self.q = q
-        self.n = p * q
-        self.phi_n = (p-1) * (q-1)
+        condition = lambda q: is_prime(q) and q != self.p
+        error_prompt = "q needs to be a prime number that's different from p."
+        input_prompt = 'Choose another value for q: '
+        self.q = valid_int_key(q, condition, error_prompt, input_prompt)
+        self.n = self.p * self.q
+        self.phi_n = (self.p-1) * (self.q-1)
         
         e = input(f'Choose an invertible element in mod {self.phi_n}: ')
-        valid = False
-        while not valid:
-            if isinstance(e, int):
-                invertible, d = is_invertible(e, self.phi_n)
-                if invertible:
-                    valid = True
-                else:
-                    print('e needs to be a whole number that has a '\
-                          f'multiplicative inverse in mod {self.phi_n}.')
-                    e = input('Choose another value for e: ')
-            elif isinstance(e, str):
-                if e.isnumeric():
-                    e = int(e)
-                else:
-                    print('e needs to be a whole number that has a '\
-                          f'multiplicative inverse in mod {self.phi_n}.')
-                    e = input('Choose another value for e: ')
-            elif isinstance(e, float):
-                print('e needs to be a whole number that has a '\
-                        f'multiplicative inverse in mod {self.phi_n}.')
-                e = input('Choose another value for e: ')
-        self.e = e
-        self.d = d
+        condition = lambda e: is_invertible(e, self.phi_n)[0]
+        error_prompt = 'e needs to be a whole number that has a '\
+                        f'multiplicative inverse in mod {self.phi_n}.'
+        input_prompt = 'Choose another value for e: '
+        self.e = valid_int_key(e, condition, error_prompt, input_prompt)
+        self.d = is_invertible(self.e, self.phi_n)[1]
         self.public_key = (self.n, self.e)
         print(f'Public key: (n, e) = {self.public_key}')
 
@@ -573,6 +452,12 @@ Public key = {self.public_key}'''
 # Rabin Cipher =============================================================
 
 class Rabin():
+    '''Attributes:
+        p (int): The first prime number used in a Rabin cipher
+        q (int): The second prime number, different from p, used in a Rabin Cipher
+        n (int): The product of p and q used in a Rabin cipher
+    '''
+    
     def __init__(self, p, q):
         '''Args:
             p (int): The first prime number chosen by the user to be used in an
@@ -581,44 +466,16 @@ class Rabin():
             user to be used in an RSA Cryptosystem
         '''
         
-        valid = False
-        while not valid:
-            if isinstance(p, int):
-                if is_prime(p):
-                    valid = True
-                else:
-                    print('p needs to be a prime number.')
-                    p = input('Choose another value for p: ')
-            elif isinstance(p, str):
-                if p.isnumeric():
-                    p = int(p)
-                else:
-                    print('p needs to be a prime number.')
-                    p = input('Choose another value for p: ')
-            elif isinstance(p, float):
-                print('p needs to be a prime number.')
-                p = input('Choose another value for p: ')
-        self.p = p
+        condition = lambda p: is_prime(p)
+        error_prompt = 'p needs to be a prime number.'
+        input_prompt = 'Choose another value for p: '
+        self.p = valid_int_key(p, condition, error_prompt, input_prompt)
         
-        valid = False
-        while not valid:
-            if isinstance(q, int):
-                if is_prime(q) and q != self.p:
-                    valid = True
-                else:
-                    print("q needs to be a prime number that's different from p.")
-                    q = input('Choose another value for q: ')
-            elif isinstance(q, str):
-                if q.isnumeric():
-                    q = int(q)
-                else:
-                    print("q needs to be a prime number that's different from p.")
-                    q = input('Choose another value for q: ')
-            elif isinstance(q, float):
-                print("q needs to be a prime number that's different from p.")
-                q = input('Choose another value for q: ')
-        self.q = q
-        self.n = p * q
+        condition = lambda q: is_prime(q) and q != self.p
+        error_prompt = "q needs to be a prime number that's different from p."
+        input_prompt = 'Choose another value for q: '
+        self.q = valid_int_key(q, condition, error_prompt, input_prompt)
+        self.n = self.p * self.q
 
     def __str__(self):
         return f'p = {self.p}\nq = {self.q}\nn = {self.n}'
@@ -675,19 +532,19 @@ class Rabin():
                     decrypted_messages += decrypted_messages_copy
                     
                 elif len(valid_solutions) == 3:
-                    decrypted_messages_copy1 = decrypted_messages_copy2\
-                                               = decrypted_messages[:]
+                    decrypted_messages_copy1 = decrypted_messages[:]
+                    decrypted_messages_copy2 = decrypted_messages[:]
                     for i in range(len(decrypted_messages)):
                         decrypted_messages[i] += VALUE_LETTERS[valid_solutions[0]]
                         decrypted_messages_copy1[i] += VALUE_LETTERS[valid_solutions[1]]
-                        decrypted_messages_copy2[i] += VALUE_LETTERS[valid_solutions[2]]         
+                        decrypted_messages_copy2[i] += VALUE_LETTERS[valid_solutions[2]]
                     decrypted_messages += decrypted_messages_copy1\
                                           + decrypted_messages_copy2
 
                 elif len(valid_solutions) == 4:
-                    decrypted_messages_copy1 = decrypted_messages_copy2\
-                                               = decrypted_messages_copy3\
-                                               = decrypted_messages[:]
+                    decrypted_messages_copy1 = decrypted_messages[:]
+                    decrypted_messages_copy2 = decrypted_messages[:]
+                    decrypted_messages_copy3 = decrypted_messages[:]
                     for i in range(len(decrypted_messages)):
                         decrypted_messages[i] += VALUE_LETTERS[valid_solutions[0]]
                         decrypted_messages_copy1[i] += VALUE_LETTERS[valid_solutions[1]]
